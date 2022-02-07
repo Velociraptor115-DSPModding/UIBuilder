@@ -10,7 +10,7 @@ public static partial class UIBuilderDSL
 {
   public abstract record WindowContext<T>(GameObject window) : UIElementContextBase<T>(window)
   {
-    protected GameObject panelBg { get; init; }
+    protected GameObject panelBg { get; set; }
     protected abstract TranslucentImage panelBgCloneImg { get; }
     protected abstract Image panelBgBorderCloneImg { get; }
     protected abstract Image panelBgDragTriggerCloneImg { get; }
@@ -21,29 +21,30 @@ public static partial class UIBuilderDSL
       if (this.panelBg != null)
         return this;
 
-      var panelBg =
-        New.UIElement("panel-bg")
+      panelBg =
+        Create.UIElement("panel-bg")
           .CloneComponentFrom(panelBgCloneImg)
-          .ChildOf(this.transform).WithAnchor(Anchor.Stretch);
+          .ChildOf(uiElement).WithAnchor(Anchor.Stretch)
+          .uiElement;
 
-      return this with { panelBg = panelBg.uiElement };
+      return this;
     }
 
     internal WindowContext<T> WithDragSupport()
     {
-      var ctx = WithPanelBg();
+      WithPanelBg();
 
-      var dragTrigger = ctx.uiElement.SelectChild("drag-trigger");
+      var dragTrigger = uiElement.SelectChild("drag-trigger");
       if (dragTrigger == null)
       {
         dragTrigger =
-          New.UIElement("drag-trigger")
+          Create.UIElement("drag-trigger")
             .CloneComponentFrom(panelBgDragTriggerCloneImg)
-            .ChildOf(ctx.panelBg).WithAnchor(Anchor.Stretch)
+            .ChildOf(panelBg).WithAnchor(Anchor.Stretch)
             .uiElement;
       }
         
-      return ctx.WithDragSupport(dragTrigger);
+      return WithDragSupport(dragTrigger);
     }
 
     internal WindowContext<T> WithDragSupport(GameObject dragTriggerObj)
@@ -57,42 +58,39 @@ public static partial class UIBuilderDSL
         uiElement.SetActive(false);
 
       dragComponent = uiElement.GetOrCreateComponent<UIWindowDrag>();
-      dragComponent.dragTrigger = dragTriggerObj.GetOrCreateComponent<EventTrigger>(); ;
+      dragComponent.dragTrigger = dragTriggerObj.GetOrCreateComponent<EventTrigger>();
 
       if (wasActive)
         uiElement.SetActive(true);
 
-      return WithDragProperties();
+      return this;
     }
 
     public WindowContext<T> WithDragProperties(int dragThreshold = 4, float damping = 0.2f, float spring = 0.5f)
     {
-      var ctx = this;
+      WithDragSupport();
       var dragComponent = uiElement.GetComponent<UIWindowDrag>();
-      if (dragComponent == null)
-        ctx = WithDragSupport();
-      dragComponent = uiElement.GetComponent<UIWindowDrag>();
       dragComponent.dragThreshold = dragThreshold;
       dragComponent.damping = damping;
       dragComponent.spring = spring;
-      return ctx;
+      return this;
     }
 
     internal WindowContext<T> WithResizeSupport()
     {
-      var ctx = WithPanelBg();
+      WithPanelBg();
 
-      var resizeTrigger = ctx.uiElement.SelectChild("resize-trigger");
+      var resizeTrigger = uiElement.SelectChild("resize-trigger");
       if (resizeTrigger == null)
       {
         resizeTrigger =
-          New.UIElement("resize-trigger")
+          Create.UIElement("resize-trigger")
             .CloneComponentFrom(UIBuilder.plainWindowPanelBgDragTrigger)
-            .ChildOf(ctx.panelBg).WithAnchor(Anchor.BottomRight).OfSize(20, 20)
+            .ChildOf(panelBg).WithAnchor(Anchor.BottomRight).OfSize(20, 20)
             .uiElement;
       }
 
-      return ctx.WithResizeSupport(resizeTrigger);
+      return WithResizeSupport(resizeTrigger);
     }
 
     internal WindowContext<T> WithResizeSupport(GameObject resizeTriggerObj)
@@ -111,25 +109,22 @@ public static partial class UIBuilderDSL
       if (wasActive)
         uiElement.SetActive(true);
 
-      return WithResizeProperties();
+      return this;
     }
 
     public WindowContext<T> WithResizeProperties(int resizeThreshold = 4, Vector2? minSizeOpt = null)
     {
       var minSize = minSizeOpt ?? new Vector2(300, 200);
-      var ctx = this;
+      WithResizeSupport();
       var resizeComponent = uiElement.GetComponent<UIWindowResize>();
-      if (resizeComponent == null)
-        ctx = WithResizeSupport();
-      resizeComponent = uiElement.GetComponent<UIWindowResize>();
       resizeComponent.resizeThreshold = resizeThreshold;
       resizeComponent.minSize = minSize;
-      return ctx;
+      return this;
     }
 
     public virtual WindowContext<T> WithShadow()
     {
-      New.UIElement("shadow")
+      Create.UIElement("shadow")
         .CloneComponentFrom(shadowCloneImg)
         .ChildOf(uiElement).WithAnchor(Anchor.Stretch);
       return this;
@@ -137,11 +132,11 @@ public static partial class UIBuilderDSL
 
     public virtual WindowContext<T> WithBorder()
     {
-      var ctx = WithPanelBg();
-      New.UIElement("border")
+      WithPanelBg();
+      Create.UIElement("border")
         .CloneComponentFrom(panelBgBorderCloneImg)
-        .ChildOf(ctx.panelBg).WithAnchor(Anchor.Stretch);
-      return ctx;
+        .ChildOf(panelBg).WithAnchor(Anchor.Stretch);
+      return this;
     }
   }
 }

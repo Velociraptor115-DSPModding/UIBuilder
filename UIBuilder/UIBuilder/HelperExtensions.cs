@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -114,6 +114,15 @@ namespace DysonSphereProgram.Modding.UI
         case (Graphic d, Graphic s):
           d.CopyFrom(s);
           break;
+        case (UIButton d, UIButton s):
+          d.CopyFrom(s);
+          break;
+        case (ScrollRect d, ScrollRect s):
+          d.CopyFrom(s);
+          break;
+        case (Scrollbar d, Scrollbar s):
+          d.CopyFrom(s);
+          break;
         case (ISupportCopyFrom<T> d, T s):
           d.CopyFrom(s);
           break;
@@ -160,6 +169,72 @@ namespace DysonSphereProgram.Modding.UI
       destination.color = source.color;
       destination.raycastTarget = source.raycastTarget;
       destination.material = source.material;
+    }
+
+    public static void CopyFrom(this UIButton destination, UIButton source)
+    {
+      destination.data = source.data;
+      destination.audios = source.audios;
+      destination.tips = source.tips;
+      if (source.transitions != null)
+      {
+        var count = source.transitions.Length;
+        destination.transitions = new UIButton.Transition[count];
+        for (int i = 0; i < count; i++)
+        {
+          destination.transitions[i] = new UIButton.Transition();
+          destination.transitions[i].CopyFrom(source.transitions[i]);
+        }
+      }
+
+      destination.tipTitleFormatString = source.tipTitleFormatString;
+      destination.tipTextFormatString = source.tipTextFormatString;
+    }
+
+    public static void CopyFrom(this UIButton.Transition destination, UIButton.Transition source)
+    {
+      destination.damp = source.damp;
+      destination.mouseoverSize = source.mouseoverSize;
+      destination.pressedSize = source.pressedSize;
+      destination.normalColor = source.normalColor;
+      destination.mouseoverColor = source.mouseoverColor;
+      destination.pressedColor = source.pressedColor;
+      destination.disabledColor = source.disabledColor;
+      destination.alphaOnly = source.alphaOnly;
+      destination.highlightSizeMultiplier = source.highlightSizeMultiplier;
+      destination.highlightColorMultiplier = source.highlightColorMultiplier;
+      destination.highlightAlphaMultiplier = source.highlightAlphaMultiplier;
+      destination.highlightColorOverride = source.highlightColorOverride;
+    }
+
+    public static void CopyFrom(this ScrollRect destination, ScrollRect source)
+    {
+      destination.movementType = source.movementType;
+      destination.elasticity = source.elasticity;
+      destination.inertia = source.inertia;
+      destination.velocity = source.velocity;
+      destination.decelerationRate = source.decelerationRate;
+      destination.scrollSensitivity = source.scrollSensitivity;
+      destination.horizontalScrollbarSpacing = source.horizontalScrollbarSpacing;
+      destination.verticalScrollbarSpacing = source.verticalScrollbarSpacing;
+    }
+    
+    public static void CopyFrom(this Scrollbar destination, Scrollbar source)
+    {
+      (destination as Selectable).CopyFrom(source as Selectable);
+      destination.direction = source.direction;
+      // destination.value = source.value;
+      // destination.size = source.size;
+      destination.numberOfSteps = source.numberOfSteps;
+    }
+    
+    public static void CopyFrom(this Selectable destination, Selectable source)
+    {
+      // destination.navigation = source.navigation;
+      destination.transition = source.transition;
+      destination.colors = source.colors;
+      destination.interactable = source.interactable;
+      // destination.spriteState = source.spriteState;
     }
   }
 }

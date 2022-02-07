@@ -72,6 +72,25 @@ namespace DysonSphereProgram.Modding.UI
     public static Image plainWindowPanelBgDragTrigger;
     public static Image fancyWindowPanelBgDragTrigger;
 
+    public static TranslucentImage fancyWindowPanelBgBtnBox;
+    public static Image fancyWindowPanelBgBtnBoxBorder;
+    public static Image fancyWindowPanelBgBtnBoxHexBtn;
+    public static Image fancyWindowPanelBgBtnBoxHexBtnR;
+    public static Image fancyWindowPanelBgBtnBoxCloseBtnX;
+    public static Image fancyWindowPanelBgBtnBoxCloseBtnCol;
+    public static Image fancyWindowPanelBgBtnBoxHexBtnL;
+    public static Image fancyWindowPanelBgBtnBoxSortBtnX;
+    public static Image fancyWindowPanelBgBtnBoxSortBtnCol;
+    public static UIButton fancyWindowPanelBgBtnBoxCloseBtnUIButton;
+    public static UIButton fancyWindowPanelBgBtnBoxSortBtnUIButton;
+
+    public static Image plainWindowPanelBgX;
+    public static UIButton plainWindowPanelBgCloseUIButton;
+
+    public static Image scrollBgImg;
+    public static Image scrollHandleImg;
+    public static Selectable scrollSelectable;
+    public static ScrollRect scrollRect;
 
     public static void Create()
     {
@@ -94,6 +113,9 @@ namespace DysonSphereProgram.Modding.UI
         plainWindowPanelBg = obj.SelectDescendant("panel-bg").GetComponent<TranslucentImage>();
         plainWindowPanelBgBorder = obj.SelectDescendant("panel-bg", "border").GetComponent<Image>();
         plainWindowPanelBgDragTrigger = obj.SelectDescendant("panel-bg", "drag-trigger").GetComponent<Image>();
+        
+        plainWindowPanelBgX = obj.SelectDescendant("panel-bg", "x").GetComponent<Image>();
+        plainWindowPanelBgCloseUIButton = obj.SelectDescendant("panel-bg", "x").GetComponent<UIButton>();
       }
 
       {
@@ -103,6 +125,28 @@ namespace DysonSphereProgram.Modding.UI
         fancyWindowPanelBgBorder = obj.SelectDescendant("panel-bg", "border").GetComponent<Image>();
         fancyWindowPanelBgBorder = obj.SelectDescendant("panel-bg", "border").GetComponent<Image>();
         fancyWindowPanelBgDragTrigger = obj.SelectDescendant("panel-bg", "drag-trigger").GetComponent<Image>();
+
+        fancyWindowPanelBgBtnBox = obj.SelectDescendant("panel-bg", "btn-box").GetComponent<TranslucentImage>();
+        fancyWindowPanelBgBtnBoxBorder = obj.SelectDescendant("panel-bg", "btn-box", "btn-border").GetComponent<Image>();
+        fancyWindowPanelBgBtnBoxHexBtn = obj.SelectDescendant("panel-bg", "btn-box", "close-btn").GetComponent<Image>();
+        
+        obj = UIRoot.instance.uiGame.inventory.gameObject;
+        fancyWindowPanelBgBtnBoxHexBtnR = obj.SelectDescendant("panel-bg", "btn-box", "close-btn").GetComponent<Image>();
+        fancyWindowPanelBgBtnBoxCloseBtnUIButton = obj.SelectDescendant("panel-bg", "btn-box", "close-btn").GetComponent<UIButton>();
+        fancyWindowPanelBgBtnBoxCloseBtnX = obj.SelectDescendant("panel-bg", "btn-box", "close-btn", "x").GetComponent<Image>();
+        fancyWindowPanelBgBtnBoxCloseBtnCol = obj.SelectDescendant("panel-bg", "btn-box", "close-btn", "col").GetComponent<Image>();
+        fancyWindowPanelBgBtnBoxHexBtnL = obj.SelectDescendant("panel-bg", "btn-box", "sort-btn").GetComponent<Image>();
+        fancyWindowPanelBgBtnBoxSortBtnUIButton = obj.SelectDescendant("panel-bg", "btn-box", "sort-btn").GetComponent<UIButton>();
+        fancyWindowPanelBgBtnBoxSortBtnX = obj.SelectDescendant("panel-bg", "btn-box", "sort-btn", "x").GetComponent<Image>();
+        fancyWindowPanelBgBtnBoxSortBtnCol = obj.SelectDescendant("panel-bg", "btn-box", "sort-btn", "col").GetComponent<Image>();
+      }
+
+      {
+        var obj = UIRoot.instance.uiGame.statWindow.achievementPanelUI.gameObject;
+        scrollRect = obj.SelectDescendant("scroll-view").GetOrCreateComponent<ScrollRect>();
+        scrollSelectable = obj.SelectDescendant("scroll-view", "v-bar").GetComponent<Scrollbar>();
+        scrollBgImg = obj.SelectDescendant("scroll-view", "v-bar").GetComponent<Image>();
+        scrollHandleImg = obj.SelectDescendant("scroll-view", "v-bar", "Sliding Area", "Handle").GetComponent<Image>();
       }
     }
 
