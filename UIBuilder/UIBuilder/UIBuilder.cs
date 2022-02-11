@@ -62,6 +62,14 @@ namespace DysonSphereProgram.Modding.UI
     }
 
 
+    public static HashSet<object> inScrollView = new HashSet<object>();
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(VFInput), nameof(VFInput.UpdateGameStates))]
+    static void PatchInScrollView()
+    {
+      VFInput.inScrollView = VFInput.inScrollView || inScrollView.Count > 0;
+    }
+
     public static Image plainWindowShadowImg;
     public static Image fancyWindowShadowImg;
 
@@ -91,6 +99,16 @@ namespace DysonSphereProgram.Modding.UI
     public static Image scrollHandleImg;
     public static Selectable scrollSelectable;
     public static ScrollRect scrollRect;
+
+    public static Image buttonImg;
+    public static Selectable buttonSelectable;
+
+    public static Font fontSAIRASB;
+
+    public static UIComboBox comboBoxComponent;
+    
+    public const string fullPlusString = "＋";
+    public const string fullMinusString = "－";
 
     public static void Create()
     {
@@ -147,6 +165,17 @@ namespace DysonSphereProgram.Modding.UI
         scrollSelectable = obj.SelectDescendant("scroll-view", "v-bar").GetComponent<Scrollbar>();
         scrollBgImg = obj.SelectDescendant("scroll-view", "v-bar").GetComponent<Image>();
         scrollHandleImg = obj.SelectDescendant("scroll-view", "v-bar", "Sliding Area", "Handle").GetComponent<Image>();
+      }
+
+      {
+        var obj = UIRoot.instance.uiGame.blueprintBrowser.inspector.saveChangesButton.gameObject;
+        buttonImg = obj.GetComponent<Image>();
+        buttonSelectable = obj.GetComponent<Button>();
+        fontSAIRASB = obj.SelectDescendant("text").GetComponent<Text>().font;
+      }
+
+      {
+        comboBoxComponent = UIRoot.instance.uiGame.monitorWindow.speakerWarningCombo;
       }
     }
 

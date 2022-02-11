@@ -8,7 +8,7 @@ namespace DysonSphereProgram.Modding.UI;
 
 public static partial class UIBuilderDSL
 {
-  public record PlainWindowContext(GameObject window) : WindowContext<PlainWindowContext>(window)
+  public record PlainWindowContext(GameObject uiElement) : WindowContext<PlainWindowContext>(uiElement)
   {
     public override PlainWindowContext Context => this;
     protected override TranslucentImage panelBgCloneImg => UIBuilder.plainWindowPanelBg;
@@ -16,21 +16,21 @@ public static partial class UIBuilderDSL
     protected override Image panelBgDragTriggerCloneImg => UIBuilder.plainWindowPanelBgDragTrigger;
     protected override Image shadowCloneImg => UIBuilder.plainWindowShadowImg;
 
-    public override WindowContext<PlainWindowContext> WithShadow()
+    public override PlainWindowContext WithShadow()
     {
       base.WithShadow();
       new UIElementContext(uiElement.SelectChild("shadow")).OfSize(44, 44);
-      return this;
+      return Context;
     }
     
     public UIButton closeUIButton { get; set; }
     
-    public PlainWindowContext WithCloseButton(System.Action closeCallback)
+    public PlainWindowContext WithCloseButton(UnityAction closeCallback)
     {
       WithPanelBg();
       var panelBgObj = uiElement.SelectDescendant("panel-bg");
       if (panelBgObj.SelectChild("x") != null)
-        return this;
+        return Context;
 
       var closeBtnObj = 
         Create.UIElement("x")
@@ -59,9 +59,9 @@ public static partial class UIBuilderDSL
       if (wasActive)
         uiElement.SetActive(true);
       
-      unityButton.onClick.AddListener(new UnityAction(closeCallback));
+      unityButton.onClick.AddListener(closeCallback);
 
-      return this;
+      return Context;
     }
   }
 }

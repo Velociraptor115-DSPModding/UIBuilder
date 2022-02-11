@@ -9,7 +9,7 @@ namespace DysonSphereProgram.Modding.UI;
 
 public static partial class UIBuilderDSL
 {
-  public record FancyWindowContext(GameObject window) : WindowContext<FancyWindowContext>(window)
+  public record FancyWindowContext(GameObject uiElement) : WindowContext<FancyWindowContext>(uiElement)
   {
     public override FancyWindowContext Context => this;
     protected override TranslucentImage panelBgCloneImg => UIBuilder.fancyWindowPanelBg;
@@ -25,7 +25,7 @@ public static partial class UIBuilderDSL
       WithPanelBg();
       var panelBgObj = uiElement.SelectDescendant("panel-bg");
       if (panelBgObj.SelectChild("btn-box") != null)
-        return this;
+        return Context;
 
       var btnBoxObj = 
         Create.UIElement("btn-box")
@@ -41,10 +41,10 @@ public static partial class UIBuilderDSL
         .ChildOf(btnBoxObj)
         .WithAnchor(Anchor.Stretch);
 
-      return this;
+      return Context;
     }
 
-    internal FancyWindowContext WithCloseButton(GameObject closeBtnObj, System.Action closeCallback)
+    internal FancyWindowContext WithCloseButton(GameObject closeBtnObj, UnityAction closeCallback)
     {
       var wasActive = uiElement.activeSelf;
       if (wasActive)
@@ -65,12 +65,12 @@ public static partial class UIBuilderDSL
       if (wasActive)
         uiElement.SetActive(true);
       
-      unityButton.onClick.AddListener(new UnityAction(closeCallback));
+      unityButton.onClick.AddListener(closeCallback);
 
-      return this;
+      return Context;
     }
     
-    internal FancyWindowContext WithSortButton(GameObject sortBtnObj, System.Action sortCallback)
+    internal FancyWindowContext WithSortButton(GameObject sortBtnObj, UnityAction sortCallback)
     {
       var wasActive = uiElement.activeSelf;
       if (wasActive)
@@ -91,17 +91,17 @@ public static partial class UIBuilderDSL
       if (wasActive)
         uiElement.SetActive(true);
       
-      unityButton.onClick.AddListener(new UnityAction(sortCallback));
+      unityButton.onClick.AddListener(sortCallback);
 
-      return this;
+      return Context;
     }
 
-    public FancyWindowContext WithCloseButton(System.Action closeCallback)
+    public FancyWindowContext WithCloseButton(UnityAction closeCallback)
     {
       WithButtonBox(false);
       var btnBoxObj = uiElement.SelectDescendant("panel-bg", "btn-box");
       if (btnBoxObj.SelectChild("close-btn") != null)
-        return this;
+        return Context;
 
       var closeBtnObj = 
         Create.UIElement("close-btn")
@@ -128,13 +128,13 @@ public static partial class UIBuilderDSL
       return WithCloseButton(closeBtnObj.uiElement, closeCallback);
     }
 
-    public FancyWindowContext WithCloseAndSortButton(System.Action closeCallback, System.Action sortCallback)
+    public FancyWindowContext WithCloseAndSortButton(UnityAction closeCallback, UnityAction sortCallback)
     {
       
       WithButtonBox(true);
       var btnBoxObj = uiElement.SelectDescendant("panel-bg", "btn-box");
       if (btnBoxObj.SelectChild("close-btn") != null)
-        return this;
+        return Context;
 
       var closeBtnObj = 
         Create.UIElement("close-btn")
