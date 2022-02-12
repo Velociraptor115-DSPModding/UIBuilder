@@ -17,20 +17,16 @@ public static partial class UIBuilderDSL
           .WithAnchor(Anchor.Stretch)
           .text;
 
-      var wasActive = uiElement.activeSelf;
-      if (wasActive)
-        uiElement.SetActive(false);
+      using (DeactivatedScope)
+      {
+        inputField = uiElement.GetOrCreateComponent<InputField>();
+        inputField.textComponent = text;
 
-      inputField = uiElement.GetOrCreateComponent<InputField>();
-      inputField.textComponent = text;
+        var fieldGraphic = uiElement.CloneComponentFrom(UIBuilder.buttonImg);
+        (inputField as Selectable).CopyFrom(UIBuilder.buttonSelectable);
 
-      var fieldGraphic = uiElement.CloneComponentFrom(UIBuilder.buttonImg);
-      (inputField as Selectable).CopyFrom(UIBuilder.buttonSelectable);
-
-      inputField.targetGraphic = fieldGraphic;
-      
-      if (wasActive)
-        uiElement.SetActive(true);
+        inputField.targetGraphic = fieldGraphic; 
+      }
     }
 
     public InputFieldContext WithContentType(InputField.ContentType contentType)
@@ -47,7 +43,7 @@ public static partial class UIBuilderDSL
     
     public InputFieldContext Bind(IDataBindSource<string> binding)
     {
-      using var _ = Deactivated;
+      using var _ = DeactivatedScope;
       
       var bindingController = uiElement.GetOrCreateComponent<DataBindInputField>();
       bindingController.Binding = binding;

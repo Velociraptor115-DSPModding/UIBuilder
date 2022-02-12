@@ -22,16 +22,10 @@ public static partial class UIBuilderDSL
 
     public TextContext WithLocalizer(string value)
     {
-      // var wasActive = uiElement.activeSelf;
-      // if (wasActive)
-      //   uiElement.SetActive(false);
-      
       var localizer = uiElement.GetOrCreateComponent<Localizer>();
       localizer.stringKey = value;
       localizer.Refresh();
       
-      // if (wasActive)
-      //   uiElement.SetActive(true);
       return Context;
     }
 

@@ -13,9 +13,7 @@ public static partial class UIBuilderDSL
 
     public SliderContext WithSliderSupport(float minValue, float maxValue, bool wholeNumbers)
     {
-      var wasActive = uiElement.activeSelf;
-      if (wasActive)
-        uiElement.SetActive(false);
+      using var _ = DeactivatedScope;
 
       var fillAreaObj =
         Create.UIElement("fill-area")
@@ -74,24 +72,16 @@ public static partial class UIBuilderDSL
 
       slider.handleRect = handle.GetComponent<RectTransform>();
 
-
-      if (wasActive)
-        uiElement.SetActive(true);
-
       return Context;
     }
 
     public SliderContext Bind(IDataBindSource<float> binding)
     {
-      var wasActive = uiElement.activeSelf;
-      if (wasActive)
-        uiElement.SetActive(false);
+      using var _ = DeactivatedScope;
       
       var bindingController = uiElement.GetOrCreateComponent<DataBindSlider>();
       bindingController.Binding = binding;
       
-      if (wasActive)
-        uiElement.SetActive(true);
       return Context;
     }
   }

@@ -84,9 +84,7 @@ public static partial class UIBuilderDSL
               .uiElement
           : null;
 
-      var wasActive = uiElement.activeSelf;
-      if (wasActive)
-        uiElement.SetActive(false);
+      using var _ = DeactivatedScope;
 
       viewportObj.GetOrCreateComponent<RectMask2D>();
       var col = viewportObj.GetOrCreateComponent<Image>();
@@ -124,9 +122,6 @@ public static partial class UIBuilderDSL
       scrollRect.horizontalScrollbar = hScrollbar;
       scrollRect.verticalScrollbarVisibility = ScrollRect.ScrollbarVisibility.AutoHide;
       scrollRect.horizontalScrollbarVisibility = ScrollRect.ScrollbarVisibility.AutoHide;
-
-      if (wasActive)
-        uiElement.SetActive(true);
 
       scrollSupport =
         new ScrollSupport(

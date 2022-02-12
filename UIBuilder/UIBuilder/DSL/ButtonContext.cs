@@ -14,10 +14,8 @@ public static partial class UIBuilderDSL
 
     public ButtonContext WithButtonSupport(string buttonText, UnityAction onClickCallback)
     {
-      var wasActive = uiElement.activeSelf;
-      if (wasActive)
-        uiElement.SetActive(false);
-      
+      using var _ = DeactivatedScope;
+
       var textObj =
         Create.Text("text")
           .WithFontSize(20)
@@ -27,7 +25,6 @@ public static partial class UIBuilderDSL
           .At(0, 0)
           .uiElement;
 
-
       var buttonImg = uiElement.CloneComponentFrom(UIBuilder.buttonImg);
 
       var button = uiElement.GetOrCreateComponent<Button>();
@@ -36,9 +33,6 @@ public static partial class UIBuilderDSL
       button.targetGraphic = buttonImg;
       
       button.onClick.AddListener(onClickCallback);
-
-      if (wasActive)
-        uiElement.SetActive(true);
 
       return Context;
     }

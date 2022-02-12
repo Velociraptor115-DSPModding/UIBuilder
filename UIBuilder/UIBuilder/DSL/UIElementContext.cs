@@ -143,7 +143,27 @@ public static partial class UIBuilderDSL
       component.InitializeFromContext(Context);
       return Context;
     }
+    public TemporaryDeactivationContext DeactivatedScope => new(uiElement);
 
     public abstract T Context { get; }
+  }
+
+  public readonly ref struct TemporaryDeactivationContext
+  {
+    private readonly bool wasActive;
+    private readonly GameObject obj;
+
+    public TemporaryDeactivationContext(GameObject obj)
+    {
+      this.wasActive = obj.activeSelf;
+      this.obj = obj;
+      obj.SetActive(false);
+    }
+
+    public void Dispose()
+    {
+      if (wasActive)
+        obj.SetActive(true);
+    }
   }
 }

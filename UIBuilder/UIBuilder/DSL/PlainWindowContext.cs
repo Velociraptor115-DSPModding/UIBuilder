@@ -41,10 +41,8 @@ public static partial class UIBuilderDSL
           .At(-13, -13)
           .uiElement
           ;
-      
-      var wasActive = uiElement.activeSelf;
-      if (wasActive)
-        uiElement.SetActive(false);
+
+      using var _ = DeactivatedScope;
       
       var unityButton = closeBtnObj.GetOrCreateComponent<Button>();
       closeUIButton = closeBtnObj.GetOrCreateComponent<UIButton>();
@@ -56,9 +54,6 @@ public static partial class UIBuilderDSL
           closeBtnObj.GetComponent<Image>();
       }
 
-      if (wasActive)
-        uiElement.SetActive(true);
-      
       unityButton.onClick.AddListener(closeCallback);
 
       return Context;

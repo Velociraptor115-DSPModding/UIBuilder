@@ -46,9 +46,7 @@ public static partial class UIBuilderDSL
 
     internal FancyWindowContext WithCloseButton(GameObject closeBtnObj, UnityAction closeCallback)
     {
-      var wasActive = uiElement.activeSelf;
-      if (wasActive)
-        uiElement.SetActive(false);
+      using var _ = DeactivatedScope;
       
       var unityButton = closeBtnObj.GetOrCreateComponent<Button>();
       closeUIButton = closeBtnObj.GetOrCreateComponent<UIButton>();
@@ -62,9 +60,6 @@ public static partial class UIBuilderDSL
           closeBtnObj.SelectDescendant("x").GetComponent<Image>();
       }
 
-      if (wasActive)
-        uiElement.SetActive(true);
-      
       unityButton.onClick.AddListener(closeCallback);
 
       return Context;
@@ -72,9 +67,7 @@ public static partial class UIBuilderDSL
     
     internal FancyWindowContext WithSortButton(GameObject sortBtnObj, UnityAction sortCallback)
     {
-      var wasActive = uiElement.activeSelf;
-      if (wasActive)
-        uiElement.SetActive(false);
+      using var _ = DeactivatedScope;
       
       var unityButton = sortBtnObj.GetOrCreateComponent<Button>();
       sortUIButton = sortBtnObj.GetOrCreateComponent<UIButton>();
@@ -88,9 +81,6 @@ public static partial class UIBuilderDSL
           sortBtnObj.SelectDescendant("x").GetComponent<Image>();
       }
 
-      if (wasActive)
-        uiElement.SetActive(true);
-      
       unityButton.onClick.AddListener(sortCallback);
 
       return Context;
@@ -130,7 +120,6 @@ public static partial class UIBuilderDSL
 
     public FancyWindowContext WithCloseAndSortButton(UnityAction closeCallback, UnityAction sortCallback)
     {
-      
       WithButtonBox(true);
       var btnBoxObj = uiElement.SelectDescendant("panel-bg", "btn-box");
       if (btnBoxObj.SelectChild("close-btn") != null)

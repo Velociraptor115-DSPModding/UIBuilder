@@ -61,15 +61,11 @@ public static partial class UIBuilderDSL
       if (dragComponent != null)
         return Context;
 
-      var wasActive = uiElement.activeSelf;
-      if (wasActive)
-        uiElement.SetActive(false);
-
-      dragComponent = uiElement.GetOrCreateComponent<UIWindowDrag>();
-      dragComponent.dragTrigger = dragTriggerObj.GetOrCreateComponent<EventTrigger>();
-
-      if (wasActive)
-        uiElement.SetActive(true);
+      using (DeactivatedScope)
+      {
+        dragComponent = uiElement.GetOrCreateComponent<UIWindowDrag>();
+        dragComponent.dragTrigger = dragTriggerObj.GetOrCreateComponent<EventTrigger>(); 
+      }
 
       return Context;
     }
@@ -107,15 +103,11 @@ public static partial class UIBuilderDSL
       if (resizeComponent != null)
         return Context;
 
-      var wasActive = uiElement.activeSelf;
-      if (wasActive)
-        uiElement.SetActive(false);
-
-      resizeComponent = uiElement.GetOrCreateComponent<UIWindowResize>();
-      resizeComponent.resizeTrigger = resizeTriggerObj.GetOrCreateComponent<EventTrigger>(); ;
-
-      if (wasActive)
-        uiElement.SetActive(true);
+      using (DeactivatedScope)
+      {
+        resizeComponent = uiElement.GetOrCreateComponent<UIWindowResize>();
+        resizeComponent.resizeTrigger = resizeTriggerObj.GetOrCreateComponent<EventTrigger>(); ; 
+      }
 
       return Context;
     }
