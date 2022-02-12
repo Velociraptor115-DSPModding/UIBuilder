@@ -1,5 +1,4 @@
 ﻿using System;
-using Bulldozer;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -11,13 +10,14 @@ namespace DysonSphereProgram.Modding.UI
     private void LateUpdate()
     {
       if (ChangedFromUI)
+      {
         UIToBinding();
-      ChangedFromUI = false;
-    }
-
-    private void FixedUpdate()
-    {
-      BindingToUI();
+        ChangedFromUI = false;
+      }
+      else
+      {
+        BindingToUI();
+      }
     }
 
     protected bool ChangedFromUI;
@@ -25,32 +25,7 @@ namespace DysonSphereProgram.Modding.UI
     protected abstract void UIToBinding();
   }
 
-  public class DataBindSliderInt : DataBindController<int>
-  {
-    private Slider slider;
-    
-    private void Start()
-    {
-      slider = GetComponent<Slider>();
-      slider.onValueChanged.AddListener(ValueChangedHandler);
-    }
-
-    private void ValueChangedHandler(float _)
-    {
-      ChangedFromUI = true;
-    }
-    protected override void BindingToUI()
-    {
-      slider.value = Binding.BoundValue;
-    }
-    
-    protected override void UIToBinding()
-    {
-      Binding.BoundValue = (int)slider.value;
-    }
-  }
-
-  public class DataBindSliderFloat : DataBindController<float>
+  public class DataBindSlider : DataBindController<float>
   {
     private Slider slider;
     
@@ -67,16 +42,16 @@ namespace DysonSphereProgram.Modding.UI
 
     protected override void BindingToUI()
     {
-      slider.value = Binding.BoundValue;
+      slider.value = Binding.Value;
     }
     
     protected override void UIToBinding()
     {
-      Binding.BoundValue = slider.value;
+      Binding.Value = slider.value;
     }
   }
   
-  public class DataBindToggle : DataBindController<bool>
+  public class DataBindToggleBool : DataBindController<bool>
   {
     private Toggle toggle;
     
@@ -93,16 +68,44 @@ namespace DysonSphereProgram.Modding.UI
 
     protected override void BindingToUI()
     {
-      toggle.isOn = Binding.BoundValue;
+      toggle.isOn = Binding.Value;
     }
     
     protected override void UIToBinding()
     {
-      Binding.BoundValue = toggle.isOn;
+      Binding.Value = toggle.isOn;
     }
   }
   
-  public class DataBindInputFieldString : DataBindController<string>
+  public class DataBindToggleEnum : DataBindController<Enum>
+  {
+    private Toggle toggle;
+    public Enum linkedValue;
+    
+    private void Start()
+    {
+      toggle = GetComponent<Toggle>();
+      toggle.onValueChanged.AddListener(ValueChangedHandler);
+    }
+    
+    private void ValueChangedHandler(bool _)
+    {
+      ChangedFromUI = true;
+    }
+
+    protected override void BindingToUI()
+    {
+      toggle.isOn = Binding.Value.Equals(linkedValue);
+    }
+    
+    protected override void UIToBinding()
+    {
+      if (toggle.isOn)
+        Binding.Value = linkedValue;
+    }
+  }
+  
+  public class DataBindInputField : DataBindController<string>
   {
     private InputField inputField;
     
@@ -119,66 +122,12 @@ namespace DysonSphereProgram.Modding.UI
 
     protected override void BindingToUI()
     {
-      inputField.text = Binding.BoundValue;
+      inputField.text = Binding.Value;
     }
     
     protected override void UIToBinding()
     {
-      Binding.BoundValue = inputField.text;
-    }
-  }
-  
-  public class DataBindInputFieldInt : DataBindController<int>
-  {
-    private InputField inputField;
-    
-    private void Start()
-    {
-      inputField = GetComponent<InputField>();
-      inputField.onValueChanged.AddListener(ValueChangedHandler);
-    }
-    
-    private void ValueChangedHandler(string _)
-    {
-      ChangedFromUI = true;
-    }
-
-    protected override void BindingToUI()
-    {
-      inputField.text = Binding.BoundValue.ToString();
-    }
-    
-    protected override void UIToBinding()
-    {
-      if (int.TryParse(inputField.text, out var parsedValue))
-        Binding.BoundValue = parsedValue;
-    }
-  }
-  
-  public class DataBindInputFieldFloat : DataBindController<float>
-  {
-    private InputField inputField;
-    
-    private void Start()
-    {
-      inputField = GetComponent<InputField>();
-      inputField.onValueChanged.AddListener(ValueChangedHandler);
-    }
-    
-    private void ValueChangedHandler(string _)
-    {
-      ChangedFromUI = true;
-    }
-
-    protected override void BindingToUI()
-    {
-      inputField.text = Binding.BoundValue.ToString();
-    }
-    
-    protected override void UIToBinding()
-    {
-      if (float.TryParse(inputField.text, out var parsedValue))
-        Binding.BoundValue = parsedValue;
+      Binding.Value = inputField.text;
     }
   }
 }

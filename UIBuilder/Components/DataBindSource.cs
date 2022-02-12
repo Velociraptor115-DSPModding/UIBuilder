@@ -3,35 +3,54 @@ using BepInEx.Configuration;
 
 namespace DysonSphereProgram.Modding.UI
 {
+  public interface IOneWayDataBindSource
+  {
+    object Value { get; }
+  }
+  
+  public interface IOneWayDataBindSource<out TVisual>
+  {
+    TVisual Value { get; }
+  }
+  
   public interface IDataBindSource<TVisual>
   {
-    TVisual BoundValue { get; set; }
+    TVisual Value { get; set; }
   }
   
   public class DataBindTransform<TLogical, TVisual>
   {
-    public Func<TLogical, TVisual> LogicalToVisualTransform;
-    public Func<TVisual, TLogical> VisualToLogicalTransform;
+    public readonly Func<TLogical, TVisual> LogicalToVisualTransform;
+    public readonly Func<TVisual, TLogical> VisualToLogicalTransform;
 
-    public static DataBindTransform<U, U> Identity<U>()
+    public DataBindTransform(Func<TLogical, TVisual> forward, Func<TVisual, TLogical> reverse)
     {
-      return new DataBindTransform<U, U>
-      {
-        LogicalToVisualTransform = x => x, VisualToLogicalTransform = x => x
-      };
+      LogicalToVisualTransform = forward;
+      VisualToLogicalTransform = reverse;
     }
   }
 
-  public abstract class DataBindSourceTransformBase<TLogical, TVisual> : IDataBindSource<TVisual>
+  public static class DataBindTransform
   {
-    private readonly DataBindTransform<TLogical, TVisual> transform;
+    public static DataBindTransform<TLogical, TVisual> From<TLogical, TVisual>
+      (Func<TLogical, TVisual> forward, Func<TVisual, TLogical> reverse)
+      => new(forward, reverse);
 
-    protected DataBindSourceTransformBase(DataBindTransform<TLogical, TVisual> transform)
+    public static DataBindTransform<T, T> Identity<T>()
+      => From<T, T>(x => x, x => x);
+  }
+
+  public abstract class DataBindSourceBase<TLogical, TVisual> : IDataBindSource<TVisual>, IOneWayDataBindSource<TVisual>, IOneWayDataBindSource
+  {
+    protected readonly DataBindTransform<TLogical, TVisual> transform;
+
+    protected DataBindSourceBase(DataBindTransform<TLogical, TVisual> transform)
     {
       this.transform = transform;
     }
 
-    public TVisual BoundValue
+    object IOneWayDataBindSource.Value => Value;
+    public virtual TVisual Value
     {
       get => transform.LogicalToVisualTransform(Get());
       set => Set(transform.VisualToLogicalTransform(value));
@@ -39,28 +58,18 @@ namespace DysonSphereProgram.Modding.UI
 
     protected abstract TLogical Get();
     protected abstract void Set(TLogical value);
+    
+    public DataBindSourceBase<TLogical, UVisual> WithTransform<UVisual>(
+      Func<TLogical, UVisual> forward,
+      Func<UVisual, TLogical> reverse
+    )
+      => WithTransform(DataBindTransform.From(forward, reverse));
+    
+    public abstract DataBindSourceBase<TLogical, UVisual> WithTransform<UVisual>(
+      DataBindTransform<TLogical, UVisual> newTransform);
   }
 
-  public class ConfigEntryDataBindSource<T> : IDataBindSource<T>
-  {
-    private readonly ConfigEntry<T> entry;
-
-    public ConfigEntryDataBindSource(ConfigEntry<T> entry)
-    {
-      this.entry = entry;
-    }
-
-    public T BoundValue
-    {
-      get => entry.Value;
-      set => entry.Value = value;
-    }
-
-    public static implicit operator ConfigEntryDataBindSource<T>(ConfigEntry<T> entry) =>
-      new ConfigEntryDataBindSource<T>(entry);
-  }
-  
-  public class ConfigEntryDataBindSource<TLogical, TVisual> : DataBindSourceTransformBase<TLogical, TVisual>
+  public class ConfigEntryDataBindSource<TLogical, TVisual> : DataBindSourceBase<TLogical, TVisual>
   {
     private readonly ConfigEntry<TLogical> entry;
 
@@ -72,29 +81,19 @@ namespace DysonSphereProgram.Modding.UI
 
     protected override TLogical Get() => entry.Value;
     protected override void Set(TLogical value) => entry.Value = value;
-  }
-
-  public class MemberDataBindSource<U, T> : IDataBindSource<T>
-  {
-    private readonly U obj;
-    private readonly Func<U, T> getter;
-    private readonly Action<U, T> setter;
-
-    public MemberDataBindSource(U obj, Func<U, T> getter, Action<U, T> setter)
-    {
-      this.obj = obj;
-      this.getter = getter;
-      this.setter = setter;
-    }
-
-    public T BoundValue
-    {
-      get => getter(obj);
-      set => setter(obj, value);
-    }
+    public override DataBindSourceBase<TLogical, UVisual> WithTransform<UVisual>(
+      DataBindTransform<TLogical, UVisual> newTransform)
+      => new ConfigEntryDataBindSource<TLogical, UVisual>(entry, newTransform);
   }
   
-  public class MemberDataBindSource<U, TLogical, TVisual> : DataBindSourceTransformBase<TLogical, TVisual>
+  public class ConfigEntryDataBindSource<T> : ConfigEntryDataBindSource<T, T>
+  {
+    public static implicit operator ConfigEntryDataBindSource<T>(ConfigEntry<T> entry) =>
+      new (entry);
+    public ConfigEntryDataBindSource(ConfigEntry<T> entry) : base(entry, DataBindTransform.Identity<T>()) { }
+  }
+
+  public class MemberDataBindSource<U, TLogical, TVisual> : DataBindSourceBase<TLogical, TVisual>
   {
     private readonly U obj;
     private readonly Func<U, TLogical> getter;
@@ -110,27 +109,18 @@ namespace DysonSphereProgram.Modding.UI
 
     protected override TLogical Get() => getter(obj);
     protected override void Set(TLogical value) => setter(obj, value);
+    public override DataBindSourceBase<TLogical, UVisual> WithTransform<UVisual>(
+      DataBindTransform<TLogical, UVisual> newTransform)
+      => new MemberDataBindSource<U, TLogical, UVisual>(obj, getter, setter, newTransform);
   }
   
-  public class DelegateDataBindSource<T> : IDataBindSource<T>
+  public class MemberDataBindSource<U, T> : MemberDataBindSource<U, T, T>
   {
-    private readonly Func<T> getter;
-    private readonly Action<T> setter;
-
-    public DelegateDataBindSource(Func<T> getter, Action<T> setter)
-    {
-      this.getter = getter;
-      this.setter = setter;
-    }
-
-    public T BoundValue
-    {
-      get => getter();
-      set => setter(value);
-    }
+    public MemberDataBindSource(U obj, Func<U, T> getter, Action<U, T> setter)
+      : base(obj, getter, setter, DataBindTransform.Identity<T>()) { }
   }
-  
-  public class DelegateDataBindSource<TLogical, TVisual> : DataBindSourceTransformBase<TLogical, TVisual>
+
+  public class DelegateDataBindSource<TLogical, TVisual> : DataBindSourceBase<TLogical, TVisual>
   {
     private readonly Func<TLogical> getter;
     private readonly Action<TLogical> setter;
@@ -144,5 +134,14 @@ namespace DysonSphereProgram.Modding.UI
 
     protected override TLogical Get() => getter();
     protected override void Set(TLogical value) => setter(value);
+    public override DataBindSourceBase<TLogical, UVisual> WithTransform<UVisual>(
+      DataBindTransform<TLogical, UVisual> newTransform)
+      => new DelegateDataBindSource<TLogical, UVisual>(getter, setter, newTransform);
+  }
+  
+  public class DelegateDataBindSource<T> : DelegateDataBindSource<T, T>
+  {
+    public DelegateDataBindSource(Func<T> getter, Action<T> setter)
+      : base(getter, setter, DataBindTransform.Identity<T>()) { }
   }
 }
