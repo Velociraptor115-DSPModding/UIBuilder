@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -42,6 +42,17 @@ namespace DysonSphereProgram.Modding.UI
       var component = gameObject.GetComponent<T>();
       if (component == null)
         component = gameObject.AddComponent<T>();
+      return component;
+    }
+    
+    public static T GetOrCreateComponentWithProperties<T>(this GameObject gameObject, params IProperties<T>[] componentProperties)
+      where T : Component
+    {
+      if (gameObject == null)
+        return null;
+      var component = gameObject.GetOrCreateComponent<T>();
+      foreach (var x in componentProperties)
+        component.CopyFrom(x);
       return component;
     }
 
@@ -127,6 +138,11 @@ namespace DysonSphereProgram.Modding.UI
           d.CopyFrom(s);
           break;
       }
+    }
+    
+    public static void CopyFrom<T>(this T destination, IProperties<T> source) where T: Component
+    {
+      source.Apply(destination);
     }
 
     public static void CopyFrom(this TranslucentImage destination, TranslucentImage source)

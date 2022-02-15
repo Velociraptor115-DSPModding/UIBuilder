@@ -35,6 +35,7 @@ public static partial class UIBuilderDSL
       return Context;
     }
 
+    public T OfSize(float width, float height) => OfSize(new Vector2(width, height));
     public T OfSize(int width, int height) => OfSize(new Vector2(width, height));
     public T OfSize(Vector2 size)
     {
@@ -127,6 +128,23 @@ public static partial class UIBuilderDSL
     {
       foreach (var child in children)
         child.ChildOf(transform);
+      return Context;
+    }
+    
+    public T WithComponent<U>(out U component) where U : Component
+      => WithComponent(out component, (System.Action<U>) null);
+    public T WithComponent<U>(System.Action<U> initializer) where U : Component
+      => WithComponent(out _, initializer);
+    public T WithComponent<U>(out U component, System.Action<U> initializer) where U : Component
+    {
+      component = uiElement.GetOrCreateComponent<U>();
+      initializer?.Invoke(component);
+      return Context;
+    }
+    public T WithComponent<U>(out U component, params IProperties<U>[] properties)
+      where U : Component
+    {
+      component = uiElement.GetOrCreateComponentWithProperties(properties);
       return Context;
     }
 

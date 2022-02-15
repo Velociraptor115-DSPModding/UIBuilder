@@ -13,10 +13,10 @@ public static partial class UIBuilderDSL
   {
     public bool hasScrollSupport { get; set; }
     protected GameObject panelBg { get; set; }
-    protected abstract TranslucentImage panelBgCloneImg { get; }
-    protected abstract Image panelBgBorderCloneImg { get; }
-    protected abstract Image panelBgDragTriggerCloneImg { get; }
-    protected abstract Image shadowCloneImg { get; }
+    protected abstract TranslucentImageProperties panelBgCloneImgProperties { get; }
+    protected abstract ImageProperties panelBgBorderCloneImgProperties { get; }
+    protected abstract ImageProperties panelBgDragTriggerCloneImgProperties { get; }
+    protected abstract ImageProperties shadowCloneImgProperties { get; }
 
     public T WithScrollSupport()
     {
@@ -31,7 +31,7 @@ public static partial class UIBuilderDSL
 
       panelBg =
         Create.UIElement("panel-bg")
-          .CloneComponentFrom(panelBgCloneImg)
+          .WithComponent(out TranslucentImage _, panelBgCloneImgProperties)
           .ChildOf(uiElement).WithAnchor(Anchor.Stretch)
           .uiElement;
 
@@ -47,7 +47,7 @@ public static partial class UIBuilderDSL
       {
         dragTrigger =
           Create.UIElement("drag-trigger")
-            .CloneComponentFrom(panelBgDragTriggerCloneImg)
+            .WithComponent(out Image _, panelBgDragTriggerCloneImgProperties)
             .ChildOf(panelBg).WithAnchor(Anchor.Stretch)
             .uiElement;
       }
@@ -89,7 +89,7 @@ public static partial class UIBuilderDSL
       {
         resizeTrigger =
           Create.UIElement("resize-trigger")
-            .CloneComponentFrom(UIBuilder.plainWindowPanelBgDragTrigger)
+            .WithComponent(out Image _, UIBuilder.plainWindowPanelBgDragTriggerProperties)
             .ChildOf(panelBg).WithAnchor(Anchor.BottomRight).OfSize(20, 20)
             .uiElement;
       }
@@ -125,7 +125,7 @@ public static partial class UIBuilderDSL
     public virtual T WithShadow()
     {
       Create.UIElement("shadow")
-        .CloneComponentFrom(shadowCloneImg)
+        .WithComponent(out Image _, shadowCloneImgProperties)
         .ChildOf(uiElement).WithAnchor(Anchor.Stretch);
       return Context;
     }
@@ -134,7 +134,7 @@ public static partial class UIBuilderDSL
     {
       WithPanelBg();
       Create.UIElement("border")
-        .CloneComponentFrom(panelBgBorderCloneImg)
+        .WithComponent(out Image _, panelBgBorderCloneImgProperties)
         .ChildOf(panelBg).WithAnchor(Anchor.Stretch);
       return Context;
     }

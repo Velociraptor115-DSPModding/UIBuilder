@@ -90,10 +90,10 @@ public static partial class UIBuilderDSL
       var col = viewportObj.GetOrCreateComponent<Image>();
       col.color = Color.clear;
 
-      vScroll.CloneComponentFrom(UIBuilder.scrollBgImg);
-      vSlidingAreaHandle.CloneComponentFrom(UIBuilder.scrollHandleImg);
+      vScroll.GetOrCreateComponentWithProperties<Image>(UIBuilder.scrollBgImgProperties);
+      var vSlidingAreaHandleImg = vSlidingAreaHandle.GetOrCreateComponentWithProperties<Image>(UIBuilder.scrollHandleImgProperties);
       var vScrollbar = vScroll.GetOrCreateComponent<Scrollbar>();
-      (vScrollbar as Selectable).CopyFrom(UIBuilder.scrollSelectable);
+      vScrollbar.targetGraphic = vSlidingAreaHandleImg;
       vScrollbar.direction = Scrollbar.Direction.BottomToTop;
       vScrollbar.handleRect = vSlidingAreaHandle.GetComponent<RectTransform>();
 
@@ -104,15 +104,15 @@ public static partial class UIBuilderDSL
 
       if (!onlyVerticalScroll)
       {
-        hScroll.CloneComponentFrom(UIBuilder.scrollBgImg);
-        hSlidingAreaHandle.CloneComponentFrom(UIBuilder.scrollHandleImg);
-        (hScrollbar as Selectable).CopyFrom(UIBuilder.scrollSelectable);
+        hScroll.GetOrCreateComponentWithProperties<Image>(UIBuilder.scrollBgImgProperties);
+        var hSlidingAreaHandleImg = hSlidingAreaHandle.GetOrCreateComponentWithProperties<Image>(UIBuilder.scrollHandleImgProperties);
+        hScrollbar.targetGraphic = hSlidingAreaHandleImg;
         hScrollbar.direction = Scrollbar.Direction.LeftToRight;
         hScrollbar.handleRect = hSlidingAreaHandle.GetComponent<RectTransform>();
       }
 
       var scrollRect = uiElement.GetOrCreateComponent<ScrollRect>();
-      scrollRect.CopyFrom(UIBuilder.scrollRect);
+      scrollRect.CopyFrom(UIBuilder.scrollRectProperties);
 
       scrollRect.content = contentObj.GetComponent<RectTransform>();
       scrollRect.viewport = viewportObj.GetComponent<RectTransform>();

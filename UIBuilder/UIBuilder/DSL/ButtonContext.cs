@@ -25,10 +25,10 @@ public static partial class UIBuilderDSL
           .At(0, 0)
           .uiElement;
 
-      var buttonImg = uiElement.CloneComponentFrom(UIBuilder.buttonImg);
+      WithComponent(out Image buttonImg, UIBuilder.buttonImgProperties);
 
       var button = uiElement.GetOrCreateComponent<Button>();
-      (button as Selectable).CopyFrom(UIBuilder.buttonSelectable);
+      (button as Selectable).CopyFrom(UIBuilder.buttonSelectableProperties);
       
       button.targetGraphic = buttonImg;
       

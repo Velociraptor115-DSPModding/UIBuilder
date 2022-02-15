@@ -22,8 +22,8 @@ public static partial class UIBuilderDSL
         inputField = uiElement.GetOrCreateComponent<InputField>();
         inputField.textComponent = text;
 
-        var fieldGraphic = uiElement.CloneComponentFrom(UIBuilder.buttonImg);
-        (inputField as Selectable).CopyFrom(UIBuilder.buttonSelectable);
+        WithComponent(out Image fieldGraphic, UIBuilder.buttonImgProperties);
+        (inputField as Selectable).CopyFrom(UIBuilder.buttonSelectableProperties);
 
         inputField.targetGraphic = fieldGraphic; 
       }

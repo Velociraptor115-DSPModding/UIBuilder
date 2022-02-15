@@ -73,10 +73,10 @@ public static partial class UIBuilderDSL
       return Select.Text(UIElement(name).uiElement);
     }
     
-    public readonly SliderContext Slider(string name, float minValue = 0, float maxValue = 10, bool wholeNumbers = false)
+    public readonly SliderContext Slider(string name, SliderConfiguration configuration)
     {
       return Select.Slider(UIElement(name).uiElement)
-        .WithSliderSupport(minValue, maxValue, wholeNumbers);
+        .WithSliderConfig(configuration);
     }
     
     public readonly InputFieldContext InputField(string name)

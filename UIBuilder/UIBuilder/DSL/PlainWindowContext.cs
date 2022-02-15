@@ -11,10 +11,10 @@ public static partial class UIBuilderDSL
   public record PlainWindowContext(GameObject uiElement) : WindowContext<PlainWindowContext>(uiElement)
   {
     public override PlainWindowContext Context => this;
-    protected override TranslucentImage panelBgCloneImg => UIBuilder.plainWindowPanelBg;
-    protected override Image panelBgBorderCloneImg => UIBuilder.plainWindowPanelBgBorder;
-    protected override Image panelBgDragTriggerCloneImg => UIBuilder.plainWindowPanelBgDragTrigger;
-    protected override Image shadowCloneImg => UIBuilder.plainWindowShadowImg;
+    protected override TranslucentImageProperties panelBgCloneImgProperties => UIBuilder.plainWindowPanelBgProperties;
+    protected override ImageProperties panelBgBorderCloneImgProperties  => UIBuilder.plainWindowPanelBgBorderProperties;
+    protected override ImageProperties panelBgDragTriggerCloneImgProperties  => UIBuilder.plainWindowPanelBgDragTriggerProperties;
+    protected override ImageProperties shadowCloneImgProperties  => UIBuilder.plainWindowShadowImgProperties;
 
     public override PlainWindowContext WithShadow()
     {
@@ -22,39 +22,24 @@ public static partial class UIBuilderDSL
       new UIElementContext(uiElement.SelectChild("shadow")).OfSize(44, 44);
       return Context;
     }
-    
-    public UIButton closeUIButton { get; set; }
-    
+
     public PlainWindowContext WithCloseButton(UnityAction closeCallback)
     {
       WithPanelBg();
-      var panelBgObj = uiElement.SelectDescendant("panel-bg");
-      if (panelBgObj.SelectChild("x") != null)
+      if (panelBg.SelectChild("x") != null)
         return Context;
 
       var closeBtnObj = 
         Create.UIElement("x")
-          .CloneComponentFrom(UIBuilder.plainWindowPanelBgX)
-          .ChildOf(panelBgObj)
+          .WithComponent(out Image xImg, UIBuilder.plainWindowPanelBgXProperties)
+          .WithComponent(out Button _, b => b.onClick.AddListener(closeCallback))
+          .WithTransitions(UIBuilder.plainWindowPanelBgXTransition.WithTarget(xImg))
+          .ChildOf(panelBg)
           .WithAnchor(Anchor.TopRight)
           .OfSize(21, 21)
           .At(-13, -13)
           .uiElement
           ;
-
-      using var _ = DeactivatedScope;
-      
-      var unityButton = closeBtnObj.GetOrCreateComponent<Button>();
-      closeUIButton = closeBtnObj.GetOrCreateComponent<UIButton>();
-      closeUIButton.CopyFrom(UIBuilder.plainWindowPanelBgCloseUIButton);
-
-      if (closeUIButton.transitions.Length >= 1)
-      {
-        closeUIButton.transitions[0].target =
-          closeBtnObj.GetComponent<Image>();
-      }
-
-      unityButton.onClick.AddListener(closeCallback);
 
       return Context;
     }

@@ -12,167 +12,150 @@ public static partial class UIBuilderDSL
   public record FancyWindowContext(GameObject uiElement) : WindowContext<FancyWindowContext>(uiElement)
   {
     public override FancyWindowContext Context => this;
-    protected override TranslucentImage panelBgCloneImg => UIBuilder.fancyWindowPanelBg;
-    protected override Image panelBgBorderCloneImg => UIBuilder.fancyWindowPanelBgBorder;
-    protected override Image panelBgDragTriggerCloneImg => UIBuilder.fancyWindowPanelBgDragTrigger;
-    protected override Image shadowCloneImg => UIBuilder.fancyWindowShadowImg;
-    
-    public UIButton closeUIButton { get; set; }
-    public UIButton sortUIButton { get; set; }
+    protected override TranslucentImageProperties panelBgCloneImgProperties => UIBuilder.fancyWindowPanelBgProperties;
+    protected override ImageProperties panelBgBorderCloneImgProperties => UIBuilder.fancyWindowPanelBgBorderProperties;
+    protected override ImageProperties panelBgDragTriggerCloneImgProperties => UIBuilder.fancyWindowPanelBgDragTriggerProperties;
+    protected override ImageProperties shadowCloneImgProperties => UIBuilder.fancyWindowShadowImgProperties;
 
     internal FancyWindowContext WithButtonBox(bool withSortBtn)
     {
       WithPanelBg();
-      var panelBgObj = uiElement.SelectDescendant("panel-bg");
-      if (panelBgObj.SelectChild("btn-box") != null)
+      if (panelBg.SelectChild("btn-box") != null)
         return Context;
 
       var btnBoxObj = 
         Create.UIElement("btn-box")
-          .CloneComponentFrom(UIBuilder.fancyWindowPanelBgBtnBox)
-          .ChildOf(panelBgObj)
+          .WithComponent(out TranslucentImage _, UIBuilder.fancyWindowPanelBgBtnBoxProperties)
+          .ChildOf(panelBg)
           .WithAnchor(Anchor.TopRight)
           .WithPivot(0.5f, 0.5f)
           .OfSize( withSortBtn ? 60 : 40, 24)
           .At(withSortBtn ? -60 : -50, -30);
 
       Create.UIElement("btn-border")
-        .CloneComponentFrom(UIBuilder.fancyWindowPanelBgBtnBoxBorder)
+        .WithComponent(out Image _, UIBuilder.fancyWindowPanelBgBtnBoxBorderProperties)
         .ChildOf(btnBoxObj)
         .WithAnchor(Anchor.Stretch);
 
       return Context;
     }
 
-    internal FancyWindowContext WithCloseButton(GameObject closeBtnObj, UnityAction closeCallback)
-    {
-      using var _ = DeactivatedScope;
-      
-      var unityButton = closeBtnObj.GetOrCreateComponent<Button>();
-      closeUIButton = closeBtnObj.GetOrCreateComponent<UIButton>();
-      closeUIButton.CopyFrom(UIBuilder.fancyWindowPanelBgBtnBoxCloseBtnUIButton);
-
-      if (closeUIButton.transitions.Length >= 2)
-      {
-        closeUIButton.transitions[0].target =
-          closeBtnObj.GetComponent<Image>();
-        closeUIButton.transitions[1].target =
-          closeBtnObj.SelectDescendant("x").GetComponent<Image>();
-      }
-
-      unityButton.onClick.AddListener(closeCallback);
-
-      return Context;
-    }
-    
-    internal FancyWindowContext WithSortButton(GameObject sortBtnObj, UnityAction sortCallback)
-    {
-      using var _ = DeactivatedScope;
-      
-      var unityButton = sortBtnObj.GetOrCreateComponent<Button>();
-      sortUIButton = sortBtnObj.GetOrCreateComponent<UIButton>();
-      sortUIButton.CopyFrom(UIBuilder.fancyWindowPanelBgBtnBoxSortBtnUIButton);
-
-      if (sortUIButton.transitions.Length >= 2)
-      {
-        sortUIButton.transitions[0].target =
-          sortBtnObj.GetComponent<Image>();
-        sortUIButton.transitions[1].target =
-          sortBtnObj.SelectDescendant("x").GetComponent<Image>();
-      }
-
-      unityButton.onClick.AddListener(sortCallback);
-
-      return Context;
-    }
-
     public FancyWindowContext WithCloseButton(UnityAction closeCallback)
     {
+      using var _ = DeactivatedScope;
+      
       WithButtonBox(false);
-      var btnBoxObj = uiElement.SelectDescendant("panel-bg", "btn-box");
+      var btnBoxObj = panelBg.SelectChild("btn-box");
       if (btnBoxObj.SelectChild("close-btn") != null)
         return Context;
 
       var closeBtnObj = 
         Create.UIElement("close-btn")
-          .CloneComponentFrom(UIBuilder.fancyWindowPanelBgBtnBoxHexBtn)
+          .WithComponent(out Image closeBtnImg, UIBuilder.fancyWindowPanelBgBtnBoxHexBtnProperties)
           .ChildOf(btnBoxObj)
+          .WithPivot(0.5f, 0.5f)
           .OfSize(38, 23)
           ;
       
       
       Create.UIElement("x")
-        .CloneComponentFrom(UIBuilder.fancyWindowPanelBgBtnBoxCloseBtnX)
+        .WithComponent(out Image closeBtnXImg, UIBuilder.fancyWindowPanelBgBtnBoxCloseBtnXProperties)
         .ChildOf(closeBtnObj)
+        .WithPivot(0.5f, 0.5f)
         .OfSize(10, 10)
         // .At(-3, 0);
         ;
       
       Create.UIElement("col")
-        .CloneComponentFrom(UIBuilder.fancyWindowPanelBgBtnBoxCloseBtnCol)
+        .WithComponent(out Image _, UIBuilder.fancyWindowPanelBgBtnBoxCloseBtnColProperties)
         .ChildOf(closeBtnObj)
+        .WithPivot(0.5f, 0.5f)
         .OfSize(25, 19)
         // .At(-2, 0)
         ;
 
-      return WithCloseButton(closeBtnObj.uiElement, closeCallback);
+      closeBtnObj
+        .WithComponent(out Button _, b => b.onClick.AddListener(closeCallback))
+        .WithTransitions(
+          UIBuilder.fancyWindowPanelBgBtnBoxCloseBtnTransition.WithTarget(closeBtnImg),
+          UIBuilder.fancyWindowPanelBgBtnBoxCloseBtnXTransition.WithTarget(closeBtnXImg)
+        );
+
+      return Context;
     }
 
     public FancyWindowContext WithCloseAndSortButton(UnityAction closeCallback, UnityAction sortCallback)
     {
       WithButtonBox(true);
-      var btnBoxObj = uiElement.SelectDescendant("panel-bg", "btn-box");
+      var btnBoxObj = panelBg.SelectChild("btn-box");
       if (btnBoxObj.SelectChild("close-btn") != null)
         return Context;
 
       var closeBtnObj = 
         Create.UIElement("close-btn")
-          .CloneComponentFrom(UIBuilder.fancyWindowPanelBgBtnBoxHexBtnR)
+          .WithComponent(out Image closeBtnImg, UIBuilder.fancyWindowPanelBgBtnBoxHexBtnRProperties)
           .ChildOf(btnBoxObj)
+          .WithPivot(0.5f, 0.5f)
           .OfSize(30, 24)
           .At(15, 0)
           ;
       
       var sortBtnObj = 
         Create.UIElement("sort-btn")
-          .CloneComponentFrom(UIBuilder.fancyWindowPanelBgBtnBoxHexBtnL)
+          .WithComponent(out Image sortBtnImg, UIBuilder.fancyWindowPanelBgBtnBoxHexBtnLProperties)
           .ChildOf(btnBoxObj)
+          .WithPivot(0.5f, 0.5f)
           .OfSize(30, 24)
           .At(-15, 0)
           ;
 
       Create.UIElement("x")
-        .CloneComponentFrom(UIBuilder.fancyWindowPanelBgBtnBoxCloseBtnX)
+        .WithComponent(out Image closeBtnXImg, UIBuilder.fancyWindowPanelBgBtnBoxCloseBtnXProperties)
         .ChildOf(closeBtnObj)
+        .WithPivot(0.5f, 0.5f)
         .OfSize(10, 10)
         .At(-3, 0)
         ;
       
       Create.UIElement("col")
-        .CloneComponentFrom(UIBuilder.fancyWindowPanelBgBtnBoxCloseBtnCol)
+        .WithComponent(out Image _, UIBuilder.fancyWindowPanelBgBtnBoxCloseBtnColProperties)
         .ChildOf(closeBtnObj)
+        .WithPivot(0.5f, 0.5f)
         .OfSize(25, 19)
         .At(-2, 0)
         ;
       
       Create.UIElement("x")
-        .CloneComponentFrom(UIBuilder.fancyWindowPanelBgBtnBoxSortBtnX)
+        .WithComponent(out Image sortBtnXImg, UIBuilder.fancyWindowPanelBgBtnBoxSortBtnXProperties)
         .ChildOf(sortBtnObj)
+        .WithPivot(0.5f, 0.5f)
         .OfSize(10, 10)
         .At(3, 0)
         ;
       
       Create.UIElement("col")
-        .CloneComponentFrom(UIBuilder.fancyWindowPanelBgBtnBoxSortBtnCol)
+        .WithComponent(out Image _, UIBuilder.fancyWindowPanelBgBtnBoxSortBtnColProperties)
         .ChildOf(sortBtnObj)
+        .WithPivot(0.5f, 0.5f)
         .OfSize(25, 19)
         .At(2, 0)
         ;
+      
+      closeBtnObj
+        .WithComponent(out Button _, b => b.onClick.AddListener(closeCallback))
+        .WithTransitions(
+            UIBuilder.fancyWindowPanelBgBtnBoxCloseBtnTransition.WithTarget(closeBtnImg),
+            UIBuilder.fancyWindowPanelBgBtnBoxCloseBtnXTransition.WithTarget(closeBtnXImg)
+          );
+      
+      sortBtnObj
+        .WithComponent(out Button _, b => b.onClick.AddListener(sortCallback))
+        .WithTransitions(
+            UIBuilder.fancyWindowPanelBgBtnBoxSortBtnTransition.WithTarget(sortBtnImg),
+            UIBuilder.fancyWindowPanelBgBtnBoxSortBtnXTransition.WithTarget(sortBtnXImg)
+          );
 
-      return
-        WithCloseButton(closeBtnObj.uiElement, closeCallback)
-          .WithSortButton(sortBtnObj.uiElement, sortCallback)
-          ;
+      return Context;
     }
   }
 }
