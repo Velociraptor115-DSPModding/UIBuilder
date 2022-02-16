@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace DysonSphereProgram.Modding.UI
+namespace DysonSphereProgram.Modding.UI.Builder
 {
   public abstract class DataBindController<T> : MonoBehaviour
   {

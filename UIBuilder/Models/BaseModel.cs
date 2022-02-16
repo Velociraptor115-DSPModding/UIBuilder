@@ -3,7 +3,7 @@ using System.Linq.Expressions;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace DysonSphereProgram.Modding.UI;
+namespace DysonSphereProgram.Modding.UI.Builder;
 
 public interface IProperties<T> where T : Component
 {

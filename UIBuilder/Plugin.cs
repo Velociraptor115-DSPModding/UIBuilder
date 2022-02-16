@@ -2,11 +2,11 @@
 using BepInEx.Logging;
 using HarmonyLib;
 
-namespace DysonSphereProgram.Modding.UI
+namespace DysonSphereProgram.Modding.UI.Builder
 {
   [BepInPlugin(GUID, NAME, VERSION)]
   [BepInProcess("DSPGAME.exe")]
-  public class Plugin : BaseUnityPlugin
+  public class UIBuilderPlugin : BaseUnityPlugin
   {
     public const string GUID = "dev.raptor.dsp.UIBuilder";
     public const string NAME = "UIBuilder";
@@ -17,10 +17,8 @@ namespace DysonSphereProgram.Modding.UI
 
     private void Awake()
     {
-      Plugin.Log = Logger;
+      UIBuilderPlugin.Log = Logger;
       _harmony = new Harmony(GUID);
-      UIBuilder.QueueReadyCallback(TestUIBuilder.Create);
-      //UIBuilder.QueueReadyCallback(TestAddingResizeSupport.Create);
       _harmony.PatchAll(typeof(UIBuilder));
       if (UIRoot.instance?.uiGame?.created ?? false)
         UIBuilder.Create();
@@ -29,12 +27,10 @@ namespace DysonSphereProgram.Modding.UI
 
     private void OnDestroy()
     {
-      TestUIBuilder.Destroy();
-      //TestAddingResizeSupport.Destroy();
       UIBuilder.Destroy();
       Logger.LogInfo("UIBuilder OnDestroy() called");
       _harmony?.UnpatchSelf();
-      Plugin.Log = null;
+      UIBuilderPlugin.Log = null;
     }
   }
 }

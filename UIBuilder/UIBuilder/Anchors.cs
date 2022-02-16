@@ -8,7 +8,7 @@ using BepInEx.Logging;
 using HarmonyLib;
 using System.Reflection.Emit;
 
-namespace DysonSphereProgram.Modding.UI
+namespace DysonSphereProgram.Modding.UI.Builder
 {
   public enum AnchorHorizontal
   {

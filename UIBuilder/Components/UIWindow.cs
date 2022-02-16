@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-namespace DysonSphereProgram.Modding.UI
+namespace DysonSphereProgram.Modding.UI.Builder
 {
   using static UIBuilderDSL;
 

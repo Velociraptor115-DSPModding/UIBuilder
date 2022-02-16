@@ -1,14 +1,18 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using BepInEx.Configuration;
 using Object = UnityEngine.Object;
+using DysonSphereProgram.Modding.UI.Builder;
 
-namespace DysonSphereProgram.Modding.UI
+namespace DysonSphereProgram.Modding.Raptor.TestUIBuilder
 {
-  public static class TestUIBuilder
+  using UI.Builder;
+  using static UI.Builder.UIBuilderDSL;
+
+  public static class UIBuilderTest
   {
     static GameObject obj;
     static UIWindow myWindow;

@@ -5,7 +5,7 @@ using UnityEngine.Events;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
-namespace DysonSphereProgram.Modding.UI;
+namespace DysonSphereProgram.Modding.UI.Builder;
 using static UIBuilderDSL;
 
 public static class UIButtonContextExtensions

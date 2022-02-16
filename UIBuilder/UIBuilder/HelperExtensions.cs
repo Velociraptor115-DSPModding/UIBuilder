@@ -4,7 +4,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace DysonSphereProgram.Modding.UI
+namespace DysonSphereProgram.Modding.UI.Builder
 {
   public static class GameObjectExtensions
   {
@@ -81,26 +81,26 @@ namespace DysonSphereProgram.Modding.UI
     }
   }
 
-  public static class MonoBehaviourExtensions
-  {
-    public static void InvokeNextFrame(this MonoBehaviour instance, System.Action executable)
-    {
-      try
-      {
-        instance.StartCoroutine(_InvokeNextFrame(executable));
-      }
-      catch
-      {
-        Plugin.Log.LogError("Couldn't invoke in next frame");
-      }
-    }
-
-    private static IEnumerator _InvokeNextFrame(System.Action executable)
-    {
-      yield return null;
-      executable();
-    }
-  }
+  // public static class MonoBehaviourExtensions
+  // {
+  //   public static void InvokeNextFrame(this MonoBehaviour instance, System.Action executable)
+  //   {
+  //     try
+  //     {
+  //       instance.StartCoroutine(_InvokeNextFrame(executable));
+  //     }
+  //     catch
+  //     {
+  //       Plugin.Log.LogError("Couldn't invoke in next frame");
+  //     }
+  //   }
+  //
+  //   private static IEnumerator _InvokeNextFrame(System.Action executable)
+  //   {
+  //     yield return null;
+  //     executable();
+  //   }
+  // }
 
   public interface ISupportCopyFrom<T> where T : Component
   {

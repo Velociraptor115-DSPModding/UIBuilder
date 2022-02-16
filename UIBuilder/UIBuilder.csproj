@@ -1,15 +1,69 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project>
+
+  <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
 
   <PropertyGroup>
-    <TargetFramework>net48</TargetFramework>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-		<LangVersion>10</LangVersion>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <LangVersion>10.0</LangVersion>
+    <PackageId>DysonSphereProgram.Modding.UI.Builder</PackageId>
+    <Version>0.0.1</Version>
+    <Authors>Raptor</Authors>
   </PropertyGroup>
+  
+  <PropertyGroup Condition="'$(Configuration)'=='PackageSources'">
+    <IsPackable>true</IsPackable>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <ContentTargetFolders>contentFiles</ContentTargetFolders>
+    <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo> 
+    <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
+    <NoWarn>CS8021</NoWarn>
+    <NoBuild>true</NoBuild>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+  </PropertyGroup>
+  
+  <ItemGroup Condition="'$(Configuration)'!='PackageSources'">
+    <None Remove="**\*.pp" /><!-- Don't show generated files during regular development -->
+  </ItemGroup>
+  <ItemGroup Condition="'$(Configuration)'=='PackageSources'">
+    <None Include="**\*.pp" Exclude="obj\**" />
+    <Compile Remove="**\*.cs" /><!-- Don't show source files during package deployment -->
+  </ItemGroup>
+ 
+  <ItemGroup Condition="'$(Configuration)'=='PackageSources'">
+    <Content Include="**\*.pp" Exclude="obj\**">
+      <Pack>true</Pack>
+      <PackagePath>$(ContentTargetFolders)\cs\netstandard2.0\$(ProjectName)\%(RecursiveDir)%(Filename)%(Extension)</PackagePath>
+    </Content>
+    <EmbeddedResource Update="@(EmbeddedResource)">
+      <Pack>true</Pack>
+      <PackagePath>$(ContentTargetFolders)\any\any\$(ProjectName)\%(RecursiveDir)%(Filename)%(Extension)</PackagePath>
+    </EmbeddedResource>
+  </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="System.Linq" Version="4.3.0" PrivateAssets="all" />
     <PackageReference Include="BepInEx.Core" Version="5.4.16" PrivateAssets="all" />
     <PackageReference Include="DysonSphereProgram.GameLibs" Version="*-*" IncludeAssets="compile" PrivateAssets="all" />
     <PackageReference Include="UnityEngine.Modules" Version="2018.4.12" IncludeAssets="compile" PrivateAssets="all" />
   </ItemGroup>
+
+  <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
+
+  <Target Name="Compile" Condition="'$(Configuration)'=='PackageSources'" />
+  <Target Name="CopyFilesToOutputDirectory" Condition="'$(Configuration)'=='PackageSources'" />
+  
+  <!-- Unfortunately the .nuspec file is not valid for .pp files due to the attributes added by None/Content/Compile -->
+  <Target Name="PostPack" AfterTargets="Pack" Condition="'$(Configuration)'=='PackageSources'">
+    <Exec Command="dotnet run --project &quot;..\PackagePrep&quot; -- nuspec $(ProjectDir)bin\$(Configuration)" />
+  </Target>
+  
+  <!-- Transform all .cs files into .cs.pp files with $RootNamespace$ -->
+  <PropertyGroup>
+    <PreBuildEvent>
+      dotnet run --project $(MSBuildProjectDirectory)/../PackagePrep -- tokenize $(MSBuildProjectDirectory) DysonSphereProgram.Modding
+    </PreBuildEvent>
+  </PropertyGroup>
 
 </Project>

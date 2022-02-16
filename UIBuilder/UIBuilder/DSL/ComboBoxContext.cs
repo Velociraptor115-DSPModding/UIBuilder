@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
-namespace DysonSphereProgram.Modding.UI;
+namespace DysonSphereProgram.Modding.UI.Builder;
 public static partial class UIBuilderDSL
 {
   public record ComboBoxContext : UIElementContextBase<ComboBoxContext>
