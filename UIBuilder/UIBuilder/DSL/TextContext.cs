@@ -7,7 +7,7 @@ using UnityEngine.EventSystems;
 namespace DysonSphereProgram.Modding.UI.Builder;
 public static partial class UIBuilderDSL
 {
-  public record TextContext : UIElementContextBase<TextContext>
+  public record TextContext : GraphicContextBase<TextContext>
   {
     public TextContext(GameObject uiElement) : base(uiElement)
     {
@@ -19,6 +19,7 @@ public static partial class UIBuilderDSL
 
     public readonly Text text;
     public override TextContext Context => this;
+    protected override Graphic graphic => text;
 
     public TextContext WithLocalizer(string value)
     {
