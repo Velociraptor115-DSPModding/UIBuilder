@@ -36,7 +36,9 @@ namespace DysonSphereProgram.Modding.UI.Builder
     public IOneWayDataBindSource<T> Binding;
     protected override T CurrentValue => Binding.Value;
   }
-  
+
+  public class DataBindValueChangedHandlerBool : DataBindValueChangeHandler<bool> {}
+
   public class ToggleValueChangedHandler : ValueChangeHandler<bool>
   {
     public Toggle toggle;

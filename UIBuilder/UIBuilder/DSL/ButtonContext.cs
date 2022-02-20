@@ -11,19 +11,21 @@ public static partial class UIBuilderDSL
   public record ButtonContext(GameObject uiElement) : UIElementContextBase<ButtonContext>(uiElement)
   {
     public override ButtonContext Context => this;
+    public TextContext text { get; private set; }
 
     public ButtonContext WithButtonSupport(string buttonText, UnityAction onClickCallback)
     {
       using var _ = DeactivatedScope;
 
-      var textObj =
+      text =
         Create.Text("text")
-          .WithFontSize(20)
+          .WithOverflow(vertical: VerticalWrapMode.Truncate)
+          .WithFontSize(20, 10, 20)
           .WithLocalizer(buttonText)
           .ChildOf(uiElement)
           .WithAnchor(Anchor.Stretch)
           .At(0, 0)
-          .uiElement;
+          ;
 
       WithComponent(out Image buttonImg, UIBuilder.buttonImgProperties);
 
@@ -34,6 +36,18 @@ public static partial class UIBuilderDSL
       
       button.onClick.AddListener(onClickCallback);
 
+      return Context;
+    }
+
+    public ButtonContext BindInteractive(IOneWayDataBindSource<bool> binding)
+    {
+      var button = uiElement.GetOrCreateComponent<Button>();
+      button.interactable = binding.Value;
+      WithComponent<DataBindValueChangedHandlerBool>(x =>
+      {
+        x.Binding = binding;
+        x.Handler = isOn => button.interactable = isOn;
+      });
       return Context;
     }
   }

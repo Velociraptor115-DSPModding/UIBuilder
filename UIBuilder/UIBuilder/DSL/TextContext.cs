@@ -36,9 +36,18 @@ public static partial class UIBuilderDSL
       return Context;
     }
     
-    public TextContext WithFontSize(int fontSize)
+    public TextContext WithFontSize(int fontSize, int? minSize = null, int? maxSize = null)
     {
       text.fontSize = fontSize;
+      if (minSize is null && maxSize is null)
+        return Context;
+
+      text.resizeTextForBestFit = true;
+      if (minSize.HasValue)
+        text.resizeTextMinSize = minSize.Value;
+      if (maxSize.HasValue)
+        text.resizeTextMaxSize = maxSize.Value;
+      
       return Context;
     }
 
@@ -51,6 +60,15 @@ public static partial class UIBuilderDSL
     public TextContext WithAlignment(TextAnchor alignment)
     {
       text.alignment = alignment;
+      return Context;
+    }
+
+    public TextContext WithOverflow(HorizontalWrapMode? horizontal = null, VerticalWrapMode? vertical = null)
+    {
+      if (horizontal.HasValue)
+        text.horizontalOverflow = horizontal.Value;
+      if (vertical.HasValue)
+        text.verticalOverflow = vertical.Value;
       return Context;
     }
   }

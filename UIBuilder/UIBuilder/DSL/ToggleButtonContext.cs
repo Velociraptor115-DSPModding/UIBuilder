@@ -18,7 +18,8 @@ public static partial class UIBuilderDSL
       
       var textObj =
         Create.Text("text")
-          .WithFontSize(20)
+          .WithOverflow(vertical: VerticalWrapMode.Truncate)
+          .WithFontSize(20, 10, 20)
           .WithLocalizer(buttonText)
           .ChildOf(uiElement)
           .WithAnchor(Anchor.Stretch)
@@ -34,6 +35,29 @@ public static partial class UIBuilderDSL
 
       if (toggleGroup != null)
         toggle.group = toggleGroup;
+
+      return Context;
+    }
+    
+    public ToggleButtonContext BindInteractive(IOneWayDataBindSource<bool> binding)
+    {
+      var toggle = uiElement.GetOrCreateComponent<Toggle>();
+      toggle.interactable = binding.Value;
+      WithComponent<DataBindValueChangedHandlerBool>(x =>
+      {
+        x.Binding = binding;
+        x.Handler = isOn => toggle.interactable = isOn;
+      });
+      
+      return Context;
+    }
+    
+    public ToggleButtonContext Bind(IDataBindSource<bool> binding)
+    {
+      using var _ = DeactivatedScope;
+      
+      var bindingController = uiElement.GetOrCreateComponent<DataBindToggleBool>();
+      bindingController.Binding = binding;
 
       return Context;
     }
@@ -61,10 +85,34 @@ public static partial class UIBuilderDSL
       
       return Context;
     }
+    
+    public ToggleButtonContext WithOnOffVisualsAndText(ColorBlock onState, ColorBlock offState, string onText, string offText)
+    {
+      using var _ = DeactivatedScope;
+
+      var toggle = uiElement.GetOrCreateComponent<Toggle>();
+      var valueChangedHandler = uiElement.GetOrCreateComponent<ToggleValueChangedHandler>();
+      valueChangedHandler.toggle = toggle;
+      valueChangedHandler.Handler =
+        CreateToggleOnOffVisualsAndTextDelegate(toggle, onState, offState, text, onText, offText);
+      
+      return Context;
+    }
 
     private static System.Action<bool> CreateToggleOnOffVisualsDelegate(Toggle component, ColorBlock onState, ColorBlock offState)
     {
       return isOn => component.colors = isOn ? onState : offState;
+    }
+    
+    private static System.Action<bool> CreateToggleOnOffVisualsAndTextDelegate(
+      Toggle toggleComponent, ColorBlock onState, ColorBlock offState,
+      Text textComponent, string onText, string offText)
+    {
+      return isOn =>
+      {
+        toggleComponent.colors = isOn ? onState : offState;
+        textComponent.text = isOn ? onText : offText;
+      };
     }
   }
 }
