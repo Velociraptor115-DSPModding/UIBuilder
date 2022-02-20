@@ -4,33 +4,31 @@ using HarmonyLib;
 
 namespace DysonSphereProgram.Modding.UI.Builder
 {
-  [BepInPlugin(GUID, NAME, VERSION)]
-  [BepInProcess("DSPGAME.exe")]
-  public class UIBuilderPlugin : BaseUnityPlugin
+  public static class UIBuilderPlugin
   {
-    public const string GUID = "dev.raptor.dsp.UIBuilder";
-    public const string NAME = "UIBuilder";
-    public const string VERSION = "0.0.1";
-
-    private Harmony _harmony;
+    private static Harmony _harmony;
     public static ManualLogSource Log;
 
-    private void Awake()
+    private static string GUID;
+
+    public static void Create(string requestingModGUID, System.Action onReadyCallback)
     {
-      UIBuilderPlugin.Log = Logger;
+      GUID = requestingModGUID + "-UIBuilder";
+      Log = Logger.CreateLogSource(GUID);
       _harmony = new Harmony(GUID);
       _harmony.PatchAll(typeof(UIBuilder));
+      UIBuilder.QueueReadyCallback(onReadyCallback);
       if (UIRoot.instance?.uiGame?.created ?? false)
         UIBuilder.Create();
-      Logger.LogInfo("UIBuilder Awake() called");
+      Log.LogInfo(GUID + " Create() called");
     }
 
-    private void OnDestroy()
+    public static void Destroy()
     {
       UIBuilder.Destroy();
-      Logger.LogInfo("UIBuilder OnDestroy() called");
+      Log.LogInfo(GUID + " Destroy() called");
       _harmony?.UnpatchSelf();
-      UIBuilderPlugin.Log = null;
+      Log = null;
     }
   }
 }
