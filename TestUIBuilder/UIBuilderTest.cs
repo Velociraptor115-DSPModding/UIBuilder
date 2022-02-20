@@ -15,7 +15,7 @@ namespace DysonSphereProgram.Modding.Raptor.TestUIBuilder
   public static class UIBuilderTest
   {
     static GameObject obj;
-    static UIWindow myWindow;
+    static UIModWindowBase myWindow;
 
     public static float mySliderValue;
     public static void Create()

@@ -9,7 +9,7 @@ namespace DysonSphereProgram.Modding.UI.Builder
 {
   using static UIBuilderDSL;
 
-  public class UIWindow: ManualBehaviour,
+  public class UIModWindowBase: ManualBehaviour,
     IInitializeFromContext<FancyWindowContext>, IInitializeFromContext<PlainWindowContext>,
     IPointerEnterHandler, IEventSystemHandler, IPointerExitHandler
   {
