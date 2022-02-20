@@ -138,5 +138,7 @@ public static partial class UIBuilderDSL
         .ChildOf(panelBg).WithAnchor(Anchor.Stretch);
       return Context;
     }
+
+    public abstract T WithTitle(string title);
   }
 }

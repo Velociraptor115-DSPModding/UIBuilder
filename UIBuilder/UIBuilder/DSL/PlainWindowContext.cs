@@ -43,5 +43,27 @@ public static partial class UIBuilderDSL
 
       return Context;
     }
+
+    public override PlainWindowContext WithTitle(string title)
+    {
+      WithPanelBg();
+      Create.Text("title-text")
+        .ChildOf(panelBg)
+        .WithAnchor(Anchor.TopLeft)
+        .At(15, -24)
+        .WithLocalizer(title)
+        .WithFont(UIBuilder.fontSAIRAB)
+        .WithFontSize(18)
+        .WithAlignment(TextAnchor.MiddleLeft)
+        .WithMaterial(UIBuilder.materialWidgetTextAlpha5x)
+        .WithColor(Color.white.AlphaMultiplied(0.6f))
+        .WithComponent<ContentSizeFitter>(
+          csf =>
+          {
+            csf.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
+          });
+      
+      return Context;
+    }
   }
 }

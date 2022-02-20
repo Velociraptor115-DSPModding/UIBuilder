@@ -157,5 +157,25 @@ public static partial class UIBuilderDSL
 
       return Context;
     }
+
+    public override FancyWindowContext WithTitle(string title)
+    {
+      WithPanelBg();
+      Create.Text("title-text")
+        .ChildOf(panelBg)
+        .WithAnchor(Anchor.TopLeft)
+        .At(50, -38)
+        .WithLocalizer(title)
+        .WithFont(UIBuilder.fontSAIRAB)
+        .WithFontSize(18)
+        .WithAlignment(TextAnchor.MiddleLeft)
+        .WithComponent<ContentSizeFitter>(
+          csf =>
+          {
+            csf.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
+          });
+
+      return Context;
+    }
   }
 }
