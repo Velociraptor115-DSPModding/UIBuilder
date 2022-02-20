@@ -86,9 +86,10 @@ public static partial class UIBuilderDSL
 
       using var _ = DeactivatedScope;
 
-      viewportObj.GetOrCreateComponent<RectMask2D>();
+      var mask = viewportObj.GetOrCreateComponent<Mask>();
+      mask.showMaskGraphic = false;
       var col = viewportObj.GetOrCreateComponent<Image>();
-      col.color = Color.clear;
+      col.color = Color.white;
 
       vScroll.GetOrCreateComponentWithProperties<Image>(UIBuilder.scrollBgImgProperties);
       var vSlidingAreaHandleImg = vSlidingAreaHandle.GetOrCreateComponentWithProperties<Image>(UIBuilder.scrollHandleImgProperties);
