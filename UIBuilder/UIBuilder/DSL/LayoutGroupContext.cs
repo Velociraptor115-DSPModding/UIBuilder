@@ -6,100 +6,124 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
 namespace DysonSphereProgram.Modding.UI.Builder;
-public static partial class UIBuilderDSL
+
+public interface ILayoutGroupContext
 {
-  public abstract record LayoutGroupContext<T, U>(GameObject uiElement) : UIElementContextBase<T>(uiElement)
-    where T: LayoutGroupContext<T, U>
-    where U: LayoutGroup
+  LayoutGroup layoutGroup { get; }
+}
+
+public static class ILayoutGroupContextExtensions
+{
+  public static T WithPadding<T>(this T Context, RectOffset padding)
+    where T: ILayoutGroupContext
   {
-    protected abstract U LayoutGroupComponent { get; }
-    
-    public T WithPadding(RectOffset padding)
-    {
-      LayoutGroupComponent.padding = padding;
-      return Context;
-    }
-    
-    public T WithChildAlignment(TextAnchor childAlignment)
-    {
-      LayoutGroupComponent.childAlignment = childAlignment;
-      return Context;
-    }
+    Context.layoutGroup.padding = padding;
+    return Context;
   }
   
-  public abstract record HorizontalOrVerticalLayoutGroupContext<T, U>(GameObject uiElement) : LayoutGroupContext<T, U>(uiElement)
-    where T: HorizontalOrVerticalLayoutGroupContext<T, U>
-    where U: HorizontalOrVerticalLayoutGroup 
+  public static T WithChildAlignment<T>(this T Context, TextAnchor childAlignment)
+    where T: ILayoutGroupContext
   {
-
-    public T WithSpacing(float spacing)
-    {
-      LayoutGroupComponent.spacing = spacing;
-      return Context;
-    }
-    
-    public T ForceExpand(bool width = true, bool height = true)
-    {
-      LayoutGroupComponent.childForceExpandWidth = width;
-      LayoutGroupComponent.childForceExpandHeight = height;
-      return Context;
-    }
-    
-    public T ChildControls(bool width = true, bool height = true)
-    {
-      LayoutGroupComponent.childControlWidth = width;
-      LayoutGroupComponent.childControlHeight = height;
-      return Context;
-    }
+    Context.layoutGroup.childAlignment = childAlignment;
+    return Context;
   }
+}
 
-  public record HorizontalLayoutGroupContext(GameObject uiElement) :
-    HorizontalOrVerticalLayoutGroupContext<HorizontalLayoutGroupContext, HorizontalLayoutGroup>(uiElement)
+public interface IHorizontalOrVerticalLayoutGroupContext: ILayoutGroupContext
+{
+  new HorizontalOrVerticalLayoutGroup layoutGroup { get; }
+}
+
+public static class HorizontalOrVerticalLayoutGroupContextExtensions
+{
+  public static T WithSpacing<T>(this T Context, float spacing)
+    where T: IHorizontalOrVerticalLayoutGroupContext
   {
-    public override HorizontalLayoutGroupContext Context => this;
-    protected override HorizontalLayoutGroup LayoutGroupComponent { get; } =
-      uiElement.GetOrCreateComponent<HorizontalLayoutGroup>();
+    Context.layoutGroup.spacing = spacing;
+    return Context;
   }
   
-  public record VerticalLayoutGroupContext(GameObject uiElement) :
-    HorizontalOrVerticalLayoutGroupContext<VerticalLayoutGroupContext, VerticalLayoutGroup>(uiElement)
+  public static T ForceExpand<T>(this T Context, bool width = true, bool height = true)
+    where T: IHorizontalOrVerticalLayoutGroupContext
   {
-    public override VerticalLayoutGroupContext Context => this;
-    protected override VerticalLayoutGroup LayoutGroupComponent { get; } =
-      uiElement.GetOrCreateComponent<VerticalLayoutGroup>();
+    Context.layoutGroup.childForceExpandWidth = width;
+    Context.layoutGroup.childForceExpandHeight = height;
+    return Context;
   }
   
-  public record GridLayoutGroupContext(GameObject uiElement) :
-    LayoutGroupContext<GridLayoutGroupContext, GridLayoutGroup>(uiElement)
+  public static T ChildControls<T>(this T Context, bool width = true, bool height = true)
+    where T: IHorizontalOrVerticalLayoutGroupContext
   {
-    public override GridLayoutGroupContext Context => this;
-    protected override GridLayoutGroup LayoutGroupComponent { get; } =
-      uiElement.GetOrCreateComponent<GridLayoutGroup>();
+    Context.layoutGroup.childControlWidth = width;
+    Context.layoutGroup.childControlHeight = height;
+    return Context;
+  }
+}
 
-    public GridLayoutGroupContext WithSpacing(Vector2 spacing)
-    {
-      LayoutGroupComponent.spacing = spacing;
-      return Context;
-    }
-    
-    public GridLayoutGroupContext WithCellSize(Vector2 cellSize)
-    {
-      LayoutGroupComponent.cellSize = cellSize;
-      return Context;
-    }
-    
-    public GridLayoutGroupContext WithConstraint(GridLayoutGroup.Constraint constraint, int constraintCount)
-    {
-      LayoutGroupComponent.constraint = constraint;
-      LayoutGroupComponent.constraintCount = constraintCount;
-      return Context;
-    }
-    
-    public GridLayoutGroupContext WithStart(GridLayoutGroup.Corner startCorner, GridLayoutGroup.Axis startAxis)
-    {
-      LayoutGroupComponent.startCorner = startCorner;
-      LayoutGroupComponent.startAxis = startAxis;
-      return Context;
-    }
+public record HorizontalLayoutGroupContext(GameObject uiElement) :
+  UIElementContext(uiElement), IHorizontalOrVerticalLayoutGroupContext
+{
+  public HorizontalLayoutGroup LayoutGroupComponent { get; } =
+    uiElement.GetOrCreateComponent<HorizontalLayoutGroup>();
+
+  HorizontalOrVerticalLayoutGroup IHorizontalOrVerticalLayoutGroupContext.layoutGroup => LayoutGroupComponent;
+  LayoutGroup ILayoutGroupContext.layoutGroup => LayoutGroupComponent;
+}
+
+public record VerticalLayoutGroupContext(GameObject uiElement) :
+  UIElementContext(uiElement), IHorizontalOrVerticalLayoutGroupContext
+{
+  public VerticalLayoutGroup LayoutGroupComponent { get; } =
+    uiElement.GetOrCreateComponent<VerticalLayoutGroup>();
+  
+  HorizontalOrVerticalLayoutGroup IHorizontalOrVerticalLayoutGroupContext.layoutGroup => LayoutGroupComponent;
+  LayoutGroup ILayoutGroupContext.layoutGroup => LayoutGroupComponent;
+}
+
+public interface IGridLayoutGroupContext: ILayoutGroupContext
+{
+  new GridLayoutGroup layoutGroup { get; }
+}
+
+public record GridLayoutGroupContext(GameObject uiElement) :
+  UIElementContext(uiElement), IGridLayoutGroupContext
+{
+  public GridLayoutGroup LayoutGroupComponent { get; } =
+    uiElement.GetOrCreateComponent<GridLayoutGroup>();
+
+  GridLayoutGroup IGridLayoutGroupContext.layoutGroup => LayoutGroupComponent;
+  LayoutGroup ILayoutGroupContext.layoutGroup => LayoutGroupComponent;
+}
+
+public static class GridLayoutGroupContextExtensions
+{
+  public static T WithSpacing<T>(this T Context, Vector2 spacing)
+    where T : IGridLayoutGroupContext
+  {
+    Context.layoutGroup.spacing = spacing;
+    return Context;
+  }
+
+  public static T WithCellSize<T>(this T Context, Vector2 cellSize)
+    where T : IGridLayoutGroupContext
+  {
+    Context.layoutGroup.cellSize = cellSize;
+    return Context;
+  }
+
+  public static T WithConstraint<T>(this T Context, GridLayoutGroup.Constraint constraint, int constraintCount)
+    where T : IGridLayoutGroupContext
+  {
+    Context.layoutGroup.constraint = constraint;
+    Context.layoutGroup.constraintCount = constraintCount;
+    return Context;
+  }
+
+  public static T WithStart<T>(this T Context, GridLayoutGroup.Corner startCorner, GridLayoutGroup.Axis startAxis)
+    where T : IGridLayoutGroupContext
+  {
+    Context.layoutGroup.startCorner = startCorner;
+    Context.layoutGroup.startAxis = startAxis;
+    return Context;
   }
 }

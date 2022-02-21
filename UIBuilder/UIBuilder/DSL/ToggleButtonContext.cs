@@ -6,113 +6,131 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
 namespace DysonSphereProgram.Modding.UI.Builder;
-public static partial class UIBuilderDSL
+
+public interface IToggleSelectableContext : ISelectableContext
 {
-  public record ToggleButtonContext(GameObject uiElement) : UIElementContextBase<ToggleButtonContext>(uiElement)
+  Toggle toggle { get; }
+}
+
+public record ToggleButtonContext(Toggle toggle, Text text) : UIElementContext(toggle.gameObject), IToggleSelectableContext, ITextContext, ISelectableVisuals
+{
+  public Graphic visuals { get; set; }
+  Text ITextContext.text => text;
+  Graphic IGraphicContext.graphic => text;
+  Toggle IToggleSelectableContext.toggle => toggle;
+  Selectable ISelectableContext.selectable => toggle;
+}
+
+public static class ToggleButtonContextExtensions
+{
+  public static ToggleButtonContext Select(Toggle toggle, Text text = null, Graphic visuals = null)
+    => new(toggle, text) { visuals = visuals };
+
+  public static ToggleButtonContext Create(GameObject toggleObj, GameObject textObj)
   {
-    public override ToggleButtonContext Context => this;
+    var toggle = toggleObj.GetOrCreateComponent<Toggle>();
+    var text = textObj.GetOrCreateComponent<Text>();
+    return Select(toggle, text);
+  }
 
-    public ToggleButtonContext WithButtonSupport(string buttonText, ToggleGroup toggleGroup = null)
-    {
-      using var _ = DeactivatedScope;
-      
-      var textObj =
-        Create.Text("text")
-          .WithOverflow(vertical: VerticalWrapMode.Truncate)
-          .WithFontSize(20, 10, 20)
-          .WithLocalizer(buttonText)
-          .ChildOf(uiElement)
-          .WithAnchor(Anchor.Stretch)
-          .At(0, 0)
-          .uiElement;
+  public static ToggleButtonContext Create(GameObject toggleObj)
+    => Select(toggleObj.GetOrCreateComponent<Toggle>());
 
-      WithComponent(out Image buttonImg, UIBuilder.buttonImgProperties);
+  public static ToggleButtonContext Create(GameObject toggleObj, string buttonText)
+  {
+    var toggle = toggleObj.GetOrCreateComponent<Toggle>();
+    return Create(toggle, buttonText);
+  }
+  
+  public static ToggleButtonContext Create(Toggle toggle, string buttonText)
+  {
+    var text =
+      UIBuilderDSL.Create.Text("text")
+        .WithOverflow(vertical: VerticalWrapMode.Truncate)
+        .WithFontSize(20, 10, 20)
+        .WithLocalizer(buttonText)
+        .ChildOf(toggle.gameObject)
+        .WithAnchor(Anchor.Stretch)
+        .At(0, 0)
+        ;
 
-      var toggle = uiElement.GetOrCreateComponent<Toggle>();
-      (toggle as Selectable).CopyFrom(UIBuilder.buttonSelectableProperties);
-      
-      toggle.targetGraphic = buttonImg;
+    return Select(toggle, text.text);
+  }
+  
+  public static T WithOnOffVisuals<T>(this T Context, ColorBlock onState, ColorBlock offState)
+    where T: ToggleButtonContext
+  {
+    using var _ = Context.DeactivatedScope;
 
-      if (toggleGroup != null)
-        toggle.group = toggleGroup;
-
-      return Context;
-    }
+    var toggle = Context.uiElement.GetOrCreateComponent<Toggle>();
+    var valueChangedHandler = Context.uiElement.GetOrCreateComponent<ToggleValueChangedHandler>();
+    valueChangedHandler.toggle = toggle;
+    valueChangedHandler.Handler =
+      CreateToggleOnOffVisualsDelegate(toggle, onState, offState);
     
-    public ToggleButtonContext BindInteractive(IOneWayDataBindSource<bool> binding)
-    {
-      var toggle = uiElement.GetOrCreateComponent<Toggle>();
-      toggle.interactable = binding.Value;
-      WithComponent<DataBindValueChangedHandlerBool>(x =>
-      {
-        x.Binding = binding;
-        x.Handler = isOn => toggle.interactable = isOn;
-      });
-      
-      return Context;
-    }
-    
-    public ToggleButtonContext Bind(IDataBindSource<bool> binding)
-    {
-      using var _ = DeactivatedScope;
-      
-      var bindingController = uiElement.GetOrCreateComponent<DataBindToggleBool>();
-      bindingController.Binding = binding;
+    return Context;
+  }
+  
+  public static T WithOnOffVisualsAndText<T>(this T Context, ColorBlock onState, ColorBlock offState, string onText, string offText)
+    where T: ToggleButtonContext
+  {
+    using var _ = Context.DeactivatedScope;
 
-      return Context;
-    }
+    var toggle = Context.uiElement.GetOrCreateComponent<Toggle>();
+    var valueChangedHandler = Context.uiElement.GetOrCreateComponent<ToggleValueChangedHandler>();
+    valueChangedHandler.toggle = toggle;
+    valueChangedHandler.Handler =
+      CreateToggleOnOffVisualsAndTextDelegate(toggle, onState, offState, Context.text, onText, offText);
     
-    public ToggleButtonContext Bind(IDataBindSource<System.Enum> binding, System.Enum linkedValue)
+    return Context;
+  }
+  
+  private static System.Action<bool> CreateToggleOnOffVisualsDelegate(Toggle component, ColorBlock onState, ColorBlock offState)
+  {
+    return isOn => component.colors = isOn ? onState : offState;
+  }
+   
+  private static System.Action<bool> CreateToggleOnOffVisualsAndTextDelegate(
+    Toggle toggleComponent, ColorBlock onState, ColorBlock offState,
+    Text textComponent, string onText, string offText)
+  {
+    return isOn =>
     {
-      using var _ = DeactivatedScope;
-      
-      var bindingController = uiElement.GetOrCreateComponent<DataBindToggleEnum>();
-      bindingController.linkedValue = linkedValue;
-      bindingController.Binding = binding;
+      toggleComponent.colors = isOn ? onState : offState;
+      textComponent.text = isOn ? onText : offText;
+    };
+  }
+}
 
-      return Context;
-    }
+public static class IToggleContextExtensions
+{
+  public static T WithToggleGroup<T>(this T Context, ToggleGroup group)
+    where T : IToggleSelectableContext
+  {
+    Context.toggle.group = group;
+    return Context;
+  }
+  
+  public static T Bind<T>(this T Context, IDataBindSource<bool> binding)
+    where T: UIElementContext, IToggleSelectableContext
+  {
+    using var _ = Context.DeactivatedScope;
     
-    public ToggleButtonContext WithOnOffVisuals(ColorBlock onState, ColorBlock offState)
-    {
-      using var _ = DeactivatedScope;
+    var bindingController = Context.uiElement.GetOrCreateComponent<DataBindToggleBool>();
+    bindingController.Binding = binding;
 
-      var toggle = uiElement.GetOrCreateComponent<Toggle>();
-      var valueChangedHandler = uiElement.GetOrCreateComponent<ToggleValueChangedHandler>();
-      valueChangedHandler.toggle = toggle;
-      valueChangedHandler.Handler =
-        CreateToggleOnOffVisualsDelegate(toggle, onState, offState);
-      
-      return Context;
-    }
+    return Context;
+  }
+  
+  public static T Bind<T>(this T Context, IDataBindSource<System.Enum> binding, System.Enum linkedValue)
+    where T: UIElementContext, IToggleSelectableContext
+  {
+    using var _ = Context.DeactivatedScope;
     
-    public ToggleButtonContext WithOnOffVisualsAndText(ColorBlock onState, ColorBlock offState, string onText, string offText)
-    {
-      using var _ = DeactivatedScope;
+    var bindingController = Context.uiElement.GetOrCreateComponent<DataBindToggleEnum>();
+    bindingController.linkedValue = linkedValue;
+    bindingController.Binding = binding;
 
-      var toggle = uiElement.GetOrCreateComponent<Toggle>();
-      var valueChangedHandler = uiElement.GetOrCreateComponent<ToggleValueChangedHandler>();
-      valueChangedHandler.toggle = toggle;
-      valueChangedHandler.Handler =
-        CreateToggleOnOffVisualsAndTextDelegate(toggle, onState, offState, text, onText, offText);
-      
-      return Context;
-    }
-
-    private static System.Action<bool> CreateToggleOnOffVisualsDelegate(Toggle component, ColorBlock onState, ColorBlock offState)
-    {
-      return isOn => component.colors = isOn ? onState : offState;
-    }
-    
-    private static System.Action<bool> CreateToggleOnOffVisualsAndTextDelegate(
-      Toggle toggleComponent, ColorBlock onState, ColorBlock offState,
-      Text textComponent, string onText, string offText)
-    {
-      return isOn =>
-      {
-        toggleComponent.colors = isOn ? onState : offState;
-        textComponent.text = isOn ? onText : offText;
-      };
-    }
+    return Context;
   }
 }

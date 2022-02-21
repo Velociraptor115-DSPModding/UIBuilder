@@ -6,29 +6,36 @@ using UnityEngine.EventSystems;
 
 namespace DysonSphereProgram.Modding.UI.Builder;
 
-public static partial class UIBuilderDSL
+public interface IGraphicContext
 {
-  public abstract record GraphicContextBase<T>(GameObject uiElement) : UIElementContextBase<T>(uiElement)
-    where T: GraphicContextBase<T>
-  {
-    protected abstract Graphic graphic { get; }
-  
-    public T WithColor(Color color)
-    {
-      graphic.color = color;
-      return Context;
-    }
-    
-    public T WithMaterial(Material material)
-    {
-      graphic.material = material;
-      return Context;
-    }
+  Graphic graphic { get; }
+}
 
-    public T WithRaycastTarget(bool raycastTarget)
-    {
-      graphic.raycastTarget = raycastTarget;
-      return Context;
-    }
+public abstract record GraphicContext(GameObject uiElement) : UIElementContext(uiElement), IGraphicContext
+{
+  public abstract Graphic graphic { get; }
+}
+
+public static class IGraphicContextExtensions
+{
+  public static T WithColor<T>(this T Context, Color color)
+    where T: IGraphicContext
+  {
+    Context.graphic.color = color;
+    return Context;
+  }
+    
+  public static T WithMaterial<T>(this T Context, Material material)
+    where T: IGraphicContext
+  {
+    Context.graphic.material = material;
+    return Context;
+  }
+
+  public static T WithRaycastTarget<T>(this T Context, bool raycastTarget)
+    where T: IGraphicContext
+  {
+    Context.graphic.raycastTarget = raycastTarget;
+    return Context;
   }
 }

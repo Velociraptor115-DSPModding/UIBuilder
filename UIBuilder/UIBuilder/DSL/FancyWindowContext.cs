@@ -77,8 +77,8 @@ public static partial class UIBuilderDSL
       closeBtnObj
         .WithComponent(out Button _, b => b.onClick.AddListener(closeCallback))
         .WithTransitions(
-          UIBuilder.fancyWindowPanelBgBtnBoxCloseBtnTransition.WithTarget(closeBtnImg),
-          UIBuilder.fancyWindowPanelBgBtnBoxCloseBtnXTransition.WithTarget(closeBtnXImg)
+          UIBuilder.fancyWindowPanelBgBtnBoxCloseBtnTransition.CloneWithTarget(closeBtnImg),
+          UIBuilder.fancyWindowPanelBgBtnBoxCloseBtnXTransition.CloneWithTarget(closeBtnXImg)
         );
 
       return Context;
@@ -144,15 +144,15 @@ public static partial class UIBuilderDSL
       closeBtnObj
         .WithComponent(out Button _, b => b.onClick.AddListener(closeCallback))
         .WithTransitions(
-            UIBuilder.fancyWindowPanelBgBtnBoxCloseBtnTransition.WithTarget(closeBtnImg),
-            UIBuilder.fancyWindowPanelBgBtnBoxCloseBtnXTransition.WithTarget(closeBtnXImg)
+            UIBuilder.fancyWindowPanelBgBtnBoxCloseBtnTransition.CloneWithTarget(closeBtnImg),
+            UIBuilder.fancyWindowPanelBgBtnBoxCloseBtnXTransition.CloneWithTarget(closeBtnXImg)
           );
       
       sortBtnObj
         .WithComponent(out Button _, b => b.onClick.AddListener(sortCallback))
         .WithTransitions(
-            UIBuilder.fancyWindowPanelBgBtnBoxSortBtnTransition.WithTarget(sortBtnImg),
-            UIBuilder.fancyWindowPanelBgBtnBoxSortBtnXTransition.WithTarget(sortBtnXImg)
+            UIBuilder.fancyWindowPanelBgBtnBoxSortBtnTransition.CloneWithTarget(sortBtnImg),
+            UIBuilder.fancyWindowPanelBgBtnBoxSortBtnXTransition.CloneWithTarget(sortBtnXImg)
           );
 
       return Context;
@@ -169,11 +169,7 @@ public static partial class UIBuilderDSL
         .WithFont(UIBuilder.fontSAIRAB)
         .WithFontSize(18)
         .WithAlignment(TextAnchor.MiddleLeft)
-        .WithComponent<ContentSizeFitter>(
-          csf =>
-          {
-            csf.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
-          });
+        .WithContentSizeFitter(horizontal: ContentSizeFitter.FitMode.PreferredSize);
 
       return Context;
     }

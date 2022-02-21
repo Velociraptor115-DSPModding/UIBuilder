@@ -7,13 +7,13 @@ using UnityEngine.EventSystems;
 namespace DysonSphereProgram.Modding.UI.Builder;
 public static partial class UIBuilderDSL
 {
-  public record ComboBoxContext : UIElementContextBase<ComboBoxContext>
+  public record ComboBoxContext : UIElementContext
   {
     public ComboBoxContext(GameObject uiElement) : base(uiElement)
     {
       
     }
     
-    public override ComboBoxContext Context => this;
+    public ComboBoxContext Context => this;
   }
 }

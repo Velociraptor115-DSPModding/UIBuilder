@@ -31,7 +31,7 @@ namespace DysonSphereProgram.Modding.Raptor.TestUIBuilder
           .WithAnchor(Anchor.TopLeft)
           .OfSize(500, 300)
           .At(300, -180)
-          .WithScrollSupport()
+          .WithScrollCapture()
           .InitializeComponent(out myWindow)
           .uiElement
           ;

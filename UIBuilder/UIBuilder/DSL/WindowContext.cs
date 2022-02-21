@@ -8,19 +8,19 @@ namespace DysonSphereProgram.Modding.UI.Builder;
 
 public static partial class UIBuilderDSL
 {
-  public abstract record WindowContext<T>(GameObject uiElement) : UIElementContextBase<T>(uiElement)
+  public abstract record WindowContext<T>(GameObject uiElement) : UIElementContext(uiElement)
     where T: WindowContext<T>
   {
-    public bool hasScrollSupport { get; set; }
+    public bool scrollCapture { get; set; }
     protected GameObject panelBg { get; set; }
     protected abstract TranslucentImageProperties panelBgCloneImgProperties { get; }
     protected abstract ImageProperties panelBgBorderCloneImgProperties { get; }
     protected abstract ImageProperties panelBgDragTriggerCloneImgProperties { get; }
     protected abstract ImageProperties shadowCloneImgProperties { get; }
 
-    public T WithScrollSupport()
+    public T WithScrollCapture()
     {
-      hasScrollSupport = true;
+      scrollCapture = true;
       return Context;
     }
 
@@ -138,6 +138,8 @@ public static partial class UIBuilderDSL
         .ChildOf(panelBg).WithAnchor(Anchor.Stretch);
       return Context;
     }
+    
+    public abstract T Context { get; }
 
     public abstract T WithTitle(string title);
   }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -5,135 +6,132 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
 namespace DysonSphereProgram.Modding.UI.Builder;
-public static partial class UIBuilderDSL
+
+public enum ScrollViewAxis
 {
-  public record ScrollSupport(
-    GameObject scrollViewObj
-    , GameObject scrollContentObj
-    , ScrollRect scrollRect
-    , Scrollbar vScrollbar
-    , Scrollbar hScrollbar
-  );
+  VerticalOnly,
+  HorizontalOnly,
+  BothVerticalAndHorizontal
+}
+
+public record struct ScrollViewConfiguration(
+  ScrollViewAxis axis = ScrollViewAxis.VerticalOnly
+  , uint scrollBarWidth = 5
+  , ScrollRectProperties scrollRectProperties = null
+  , ImageProperties scrollBgImgProperties = null
+  , ImageProperties scrollHandleImgProperties = null
+);
+
+public record ScrollViewContext(ScrollRect scrollRect) : UIElementContext(scrollRect.gameObject);
+
+public static class ScrollViewContextExtensions
+{
+  public static ScrollViewContext Select(ScrollRect scrollRect)
+    => new ScrollViewContext(scrollRect);
   
-  public record ScrollViewContext(GameObject uiElement) : UIElementContextBase<ScrollViewContext>(uiElement)
+  public static ScrollViewContext Create(GameObject uiElement, ScrollViewConfiguration configuration)
   {
-    public override ScrollViewContext Context => this;
+    using var _ = uiElement.DeactivatedScope();
 
-    public ScrollSupport scrollSupport { get; set; }
-    public GameObject contentRoot => scrollSupport != null ? scrollSupport.scrollContentObj : uiElement;
+    var scrollRectProperties = configuration.scrollRectProperties ?? UIBuilder.scrollRectProperties;
+    var scrollBgImgProperties = configuration.scrollBgImgProperties ?? UIBuilder.scrollBgImgProperties;
+    var scrollHandleImgProperties = configuration.scrollHandleImgProperties ?? UIBuilder.scrollHandleImgProperties;
 
-    public ScrollViewContext WithScrollSupport(bool onlyVerticalScroll = true, uint scrollBarWidth = 5)
+    var scrollRect = uiElement.GetOrCreateComponentWithProperties(scrollRectProperties);
+
+    var viewport =
+      UIBuilderDSL.Create.UIElement("viewport")
+        .ChildOf(uiElement).WithAnchor(Anchor.Stretch)
+        .At(0, 0)
+        .WithComponent(out Mask _, x => x.showMaskGraphic = false)
+        .WithComponent(out Image _, x => x.color = Color.white);
+    
+    scrollRect.viewport = viewport.transform;
+
+    var contentAnchor = configuration.axis switch
     {
-      if (scrollSupport != null)
-        return Context;
+      ScrollViewAxis.VerticalOnly => Anchor.TopStretch,
+      ScrollViewAxis.HorizontalOnly => Anchor.StretchLeft,
+      ScrollViewAxis.BothVerticalAndHorizontal => Anchor.TopLeft,
+      _ => throw new ArgumentOutOfRangeException("configuration.axis", configuration.axis, null)
+    };
 
-      var viewportObj =
-        Create.UIElement("viewport")
-          .ChildOf(uiElement).WithAnchor(Anchor.Stretch)
-          .At(0, 0)
-          .uiElement;
+    var content =
+      UIBuilderDSL.Create.UIElement("content")
+        .ChildOf(viewport).WithAnchor(contentAnchor)
+        .WithPivot(0, 1)
+        .At(0, 0);
+    
+    scrollRect.content = content.transform;
+    
+    var horizontalScroll = configuration.axis is ScrollViewAxis.HorizontalOnly or ScrollViewAxis.BothVerticalAndHorizontal;
+    var verticalScroll = configuration.axis is ScrollViewAxis.VerticalOnly or ScrollViewAxis.BothVerticalAndHorizontal;
+    
+    scrollRect.vertical = verticalScroll;
+    scrollRect.horizontal = horizontalScroll;
 
-      var contentObj =
-        Create.UIElement("content")
-          .ChildOf(viewportObj).WithAnchor(onlyVerticalScroll ? Anchor.TopStretch : Anchor.TopLeft)
-          .WithPivot(0, 1)
-          .At(0, 0)
-          .uiElement;
-      
+    if (verticalScroll)
+    {
       var vScroll =
-        Create.UIElement("v-bar")
+        UIBuilderDSL.Create.UIElement("v-bar")
           .ChildOf(uiElement).WithAnchor(Anchor.StretchRight).WithPivot(1, 1)
-          .OfSize((int)scrollBarWidth, 0)
-          .At(0, 0)
-          .uiElement;
+          .OfSize((int) configuration.scrollBarWidth, 0)
+          .At(0, 0);
 
       var vSlidingArea =
-        Create.UIElement("sliding-area")
+        UIBuilderDSL.Create.UIElement("sliding-area")
           .ChildOf(vScroll).WithAnchor(Anchor.Stretch)
-          .At(0, 0)
-          .uiElement;
-      
-      var vSlidingAreaHandle =
-        Create.UIElement("handle")
-          .ChildOf(vSlidingArea).WithAnchor(Anchor.TopStretch)
-          .OfSize(0, 0).At(0, 0)
-          .uiElement;
+          .At(0, 0);
 
+      var vSlidingAreaHandle =
+        UIBuilderDSL.Create.UIElement("handle")
+          .ChildOf(vSlidingArea).WithAnchor(Anchor.TopStretch)
+          .OfSize(0, 0).At(0, 0);
+
+      vScroll.WithComponent(out Image _, scrollBgImgProperties);
+      vSlidingAreaHandle.WithComponent(out Image vSlidingAreaHandleImg, scrollHandleImgProperties);
+      vScroll.WithComponent(out Scrollbar vScrollbar, x =>
+      {
+        x.targetGraphic = vSlidingAreaHandleImg;
+        x.direction = Scrollbar.Direction.BottomToTop;
+        x.handleRect = vSlidingAreaHandle.transform;
+      });
+      
+      scrollRect.verticalScrollbar = vScrollbar;
+      scrollRect.verticalScrollbarVisibility = ScrollRect.ScrollbarVisibility.AutoHide;
+    }
+    
+    if (horizontalScroll)
+    {
       var hScroll =
-        !onlyVerticalScroll
-          ? Create.UIElement("h-bar")
-              .ChildOf(uiElement).WithAnchor(Anchor.BottomStretch).WithPivot(0, 0)
-              .OfSize(0, (int)scrollBarWidth)
-              .At(0, 0)
-              .uiElement
-          : null;
+        UIBuilderDSL.Create.UIElement("h-bar")
+          .ChildOf(uiElement).WithAnchor(Anchor.BottomStretch).WithPivot(0, 0)
+          .OfSize(0, (int) configuration.scrollBarWidth)
+          .At(0, 0);
 
       var hSlidingArea =
-        !onlyVerticalScroll
-          ? Create.UIElement("sliding-area")
-              .ChildOf(hScroll).WithAnchor(Anchor.Stretch)
-              .At(0, 0)
-              .uiElement
-          : null;
+        UIBuilderDSL.Create.UIElement("sliding-area")
+          .ChildOf(hScroll).WithAnchor(Anchor.Stretch)
+          .At(0, 0);
 
       var hSlidingAreaHandle =
-        !onlyVerticalScroll
-          ? Create.UIElement("handle")
-              .ChildOf(hSlidingArea).WithAnchor(Anchor.StretchLeft)
-              .OfSize(0, 0).At(0, 0)
-              .uiElement
-          : null;
+        UIBuilderDSL.Create.UIElement("handle")
+          .ChildOf(hSlidingArea).WithAnchor(Anchor.StretchLeft)
+          .OfSize(0, 0).At(0, 0);
 
-      using var _ = DeactivatedScope;
-
-      var mask = viewportObj.GetOrCreateComponent<Mask>();
-      mask.showMaskGraphic = false;
-      var col = viewportObj.GetOrCreateComponent<Image>();
-      col.color = Color.white;
-
-      vScroll.GetOrCreateComponentWithProperties<Image>(UIBuilder.scrollBgImgProperties);
-      var vSlidingAreaHandleImg = vSlidingAreaHandle.GetOrCreateComponentWithProperties<Image>(UIBuilder.scrollHandleImgProperties);
-      var vScrollbar = vScroll.GetOrCreateComponent<Scrollbar>();
-      vScrollbar.targetGraphic = vSlidingAreaHandleImg;
-      vScrollbar.direction = Scrollbar.Direction.BottomToTop;
-      vScrollbar.handleRect = vSlidingAreaHandle.GetComponent<RectTransform>();
-
-      var hScrollbar =
-        !onlyVerticalScroll
-          ? hScroll.GetOrCreateComponent<Scrollbar>()
-          : null;
-
-      if (!onlyVerticalScroll)
+      hScroll.WithComponent(out Image _, scrollBgImgProperties);
+      hSlidingAreaHandle.WithComponent(out Image hSlidingAreaHandleImg, scrollHandleImgProperties);
+      hScroll.WithComponent(out Scrollbar hScrollbar, x =>
       {
-        hScroll.GetOrCreateComponentWithProperties<Image>(UIBuilder.scrollBgImgProperties);
-        var hSlidingAreaHandleImg = hSlidingAreaHandle.GetOrCreateComponentWithProperties<Image>(UIBuilder.scrollHandleImgProperties);
-        hScrollbar.targetGraphic = hSlidingAreaHandleImg;
-        hScrollbar.direction = Scrollbar.Direction.LeftToRight;
-        hScrollbar.handleRect = hSlidingAreaHandle.GetComponent<RectTransform>();
-      }
-
-      var scrollRect = uiElement.GetOrCreateComponent<ScrollRect>();
-      scrollRect.CopyFrom(UIBuilder.scrollRectProperties);
-
-      scrollRect.content = contentObj.GetComponent<RectTransform>();
-      scrollRect.viewport = viewportObj.GetComponent<RectTransform>();
-      scrollRect.vertical = true;
-      scrollRect.horizontal = !onlyVerticalScroll;
-      scrollRect.verticalScrollbar = vScrollbar;
+        x.targetGraphic = hSlidingAreaHandleImg;
+        x.direction = Scrollbar.Direction.LeftToRight;
+        x.handleRect = hSlidingAreaHandle.transform;
+      });
+      
       scrollRect.horizontalScrollbar = hScrollbar;
-      scrollRect.verticalScrollbarVisibility = ScrollRect.ScrollbarVisibility.AutoHide;
       scrollRect.horizontalScrollbarVisibility = ScrollRect.ScrollbarVisibility.AutoHide;
-
-      scrollSupport =
-        new ScrollSupport(
-            uiElement
-          , contentObj
-          , scrollRect
-          , vScrollbar
-          , hScrollbar
-        );
-
-      return Context;
     }
+
+    return Select(scrollRect);
   }
 }

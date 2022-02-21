@@ -446,8 +446,8 @@ namespace DysonSphereProgram.Modding.UI.Builder
           raycastTarget = false
         };
         
-        fancyWindowPanelBgBtnBoxSortBtnTransition = fancyWindowPanelBgBtnBoxCloseBtnTransition.WithTarget(null);
-        fancyWindowPanelBgBtnBoxSortBtnXTransition = fancyWindowPanelBgBtnBoxCloseBtnXTransition.WithTarget(null);
+        fancyWindowPanelBgBtnBoxSortBtnTransition = fancyWindowPanelBgBtnBoxCloseBtnTransition.CloneWithTarget(null);
+        fancyWindowPanelBgBtnBoxSortBtnXTransition = fancyWindowPanelBgBtnBoxCloseBtnXTransition.CloneWithTarget(null);
         fancyWindowPanelBgBtnBoxSortBtnXProperties = new()
         {
           sprite = spriteRefreshIcon,

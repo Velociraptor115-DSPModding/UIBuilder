@@ -13,14 +13,24 @@ public static partial class UIBuilderDSL
 
   public struct SelectContext
   {
-    public readonly UIElementContext UIElement(GameObject obj) => new UIElementContext(obj);
+    public readonly UIElementContext UIElement(RectTransform transform)
+      => UIElementExtensions.Select(transform.gameObject);
+    public readonly UIElementContext UIElement(GameObject obj)
+      => UIElementExtensions.Select(obj);
     public readonly PlainWindowContext PlainWindow(GameObject obj) => new PlainWindowContext(obj);
     public readonly FancyWindowContext FancyWindow(GameObject obj) => new FancyWindowContext(obj);
-    public readonly ScrollViewContext ScrollView(GameObject obj) => new ScrollViewContext(obj);
-    public readonly ButtonContext Button(GameObject obj) => new ButtonContext(obj);
-    public readonly TextContext Text(GameObject obj) => new TextContext(obj);
-    public readonly SliderContext Slider(GameObject obj) => new SliderContext(obj);
-    public readonly InputFieldContext InputField(GameObject obj) => new InputFieldContext(obj);
+    public readonly ScrollViewContext ScrollView(ScrollRect scrollRect)
+      => ScrollViewContextExtensions.Select(scrollRect);
+    public readonly ButtonContext Button(Button button, Text text = null, Graphic visuals = null)
+      => ButtonContextExtensions.Select(button, text, visuals);
+    public readonly ToggleButtonContext ToggleButton(Toggle toggle, Text text = null, Graphic visuals = null)
+      => ToggleButtonContextExtensions.Select(toggle, text, visuals);
+    public readonly TextContext Text(Text text)
+      => TextContextExtensions.Select(text);
+    public readonly SliderContext Slider(Slider slider, Image fill, Image handle = null)
+      => SliderContextExtensions.Select(slider, fill, handle);
+    public readonly InputFieldContext InputField(InputField inputField, Text text = null)
+      => InputFieldContextExtensions.Select(inputField, text);
     public readonly ComboBoxContext ComboBox(GameObject obj) => new ComboBoxContext(obj);
     public readonly HorizontalLayoutGroupContext HorizontalLayoutGroup(GameObject obj) => new HorizontalLayoutGroupContext(obj);
     public readonly VerticalLayoutGroupContext VerticalLayoutGroup(GameObject obj) => new VerticalLayoutGroupContext(obj);
@@ -30,11 +40,7 @@ public static partial class UIBuilderDSL
   public struct CreateContext
   {
     public readonly UIElementContext UIElement(string name)
-    {
-      var obj = new GameObject(name, typeof(RectTransform));
-      obj.SetLayer((int)Layer.UI);
-      return Select.UIElement(obj).OfSize(0, 0).WithPivot(0, 1).At(0, 0).Context; 
-    }
+      => UIElementExtensions.Create(name);
 
     public readonly PlainWindowContext PlainWindow(string name)
     {
@@ -56,33 +62,24 @@ public static partial class UIBuilderDSL
         ;
     }
 
-    public readonly ScrollViewContext ScrollView(string name, bool onlyVerticalScroll = true, uint scrollBarWidth = 5)
-    {
-      return Select.ScrollView(UIElement(name).uiElement)
-        .WithScrollSupport(onlyVerticalScroll, scrollBarWidth);
-    }
+    public readonly ScrollViewContext ScrollView(string name, ScrollViewConfiguration configuration)
+      => ScrollViewContextExtensions.Create(UIElement(name).uiElement, configuration);
 
     public readonly ButtonContext Button(string name, string buttonText, UnityAction onClickCallback)
-    {
-      return Select.Button(UIElement(name).uiElement)
-        .WithButtonSupport(buttonText, onClickCallback);
-    }
-    
+      => ButtonContextExtensions.Create(UIElement(name).uiElement, buttonText)
+          .AddClickListener(onClickCallback);
+
+    public readonly ToggleButtonContext ToggleButton(string name, string buttonText)
+      => ToggleButtonContextExtensions.Create(UIElement(name).uiElement, buttonText);
+
     public readonly TextContext Text(string name)
-    {
-      return Select.Text(UIElement(name).uiElement);
-    }
-    
+      => TextContextExtensions.Create(UIElement(name).uiElement);
+
     public readonly SliderContext Slider(string name, SliderConfiguration configuration)
-    {
-      return Select.Slider(UIElement(name).uiElement)
-        .WithSliderConfig(configuration);
-    }
-    
+      => SliderContextExtensions.Create(UIElement(name).uiElement, configuration);
+
     public readonly InputFieldContext InputField(string name)
-    {
-      return Select.InputField(UIElement(name).uiElement);
-    }
+      => InputFieldContextExtensions.Create(UIElement(name).uiElement);
     
     public readonly ComboBoxContext ComboBox(string name)
     {

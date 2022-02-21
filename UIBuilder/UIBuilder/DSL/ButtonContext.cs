@@ -6,49 +6,82 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
 namespace DysonSphereProgram.Modding.UI.Builder;
-public static partial class UIBuilderDSL
+
+public interface IButtonSelectableContext : ISelectableContext
 {
-  public record ButtonContext(GameObject uiElement) : UIElementContextBase<ButtonContext>(uiElement)
+  Button button { get; }
+}
+
+public record ButtonContext(Button button, Text text) : UIElementContext(button.gameObject), IButtonSelectableContext, ITextContext, ISelectableVisuals
+{
+  public Graphic visuals { get; set; }
+  Text ITextContext.text => text;
+  Graphic IGraphicContext.graphic => text;
+  Button IButtonSelectableContext.button => button;
+  Selectable ISelectableContext.selectable => button;
+}
+
+public static class ButtonContextExtensions
+{
+  public static ButtonContext Select(Button button, Text text = null, Graphic visuals = null)
+    => new(button, text) { visuals = visuals };
+
+  public static ButtonContext Create(GameObject buttonObj, GameObject textObj)
   {
-    public override ButtonContext Context => this;
-    public TextContext text { get; private set; }
-
-    public ButtonContext WithButtonSupport(string buttonText, UnityAction onClickCallback)
-    {
-      using var _ = DeactivatedScope;
-
-      text =
-        Create.Text("text")
-          .WithOverflow(vertical: VerticalWrapMode.Truncate)
-          .WithFontSize(20, 10, 20)
-          .WithLocalizer(buttonText)
-          .ChildOf(uiElement)
-          .WithAnchor(Anchor.Stretch)
-          .At(0, 0)
-          ;
-
-      WithComponent(out Image buttonImg, UIBuilder.buttonImgProperties);
-
-      var button = uiElement.GetOrCreateComponent<Button>();
-      (button as Selectable).CopyFrom(UIBuilder.buttonSelectableProperties);
-      
-      button.targetGraphic = buttonImg;
-      
-      button.onClick.AddListener(onClickCallback);
-
-      return Context;
-    }
-
-    public ButtonContext BindInteractive(IOneWayDataBindSource<bool> binding)
-    {
-      var button = uiElement.GetOrCreateComponent<Button>();
-      button.interactable = binding.Value;
-      WithComponent<DataBindValueChangedHandlerBool>(x =>
-      {
-        x.Binding = binding;
-        x.Handler = isOn => button.interactable = isOn;
-      });
-      return Context;
-    }
+    var button = buttonObj.GetOrCreateComponent<Button>();
+    var text = textObj.GetOrCreateComponent<Text>();
+    return Select(button, text);
   }
+
+  public static ButtonContext Create(GameObject buttonObj)
+    => Select(buttonObj.GetOrCreateComponent<Button>());
+
+  public static ButtonContext Create(GameObject buttonObj, string buttonText)
+  {
+    var button = buttonObj.GetOrCreateComponent<Button>();
+    return Create(button, buttonText);
+  }
+  
+  public static ButtonContext Create(Button button, string buttonText)
+  {
+    var text =
+      UIBuilderDSL.Create.Text("text")
+        .WithOverflow(vertical: VerticalWrapMode.Truncate)
+        .WithFontSize(20, 10, 20)
+        .WithLocalizer(buttonText)
+        .ChildOf(button.gameObject)
+        .WithAnchor(Anchor.Stretch)
+        .At(0, 0)
+        ;
+
+    return Select(button, text.text);
+  }
+}
+
+public static class IButtonContextExtensions
+{
+  public static T AddClickListener<T>(this T Context, UnityAction onClickCallback)
+    where T : IButtonSelectableContext
+  {
+    Context.button.onClick.AddListener(onClickCallback);
+    return Context;
+  }
+  
+  public static T RemoveClickListener<T>(this T Context, UnityAction onClickCallback)
+    where T : IButtonSelectableContext
+  {
+    Context.button.onClick.RemoveListener(onClickCallback);
+    return Context;
+  }
+  
+  public static T ClearClickListeners<T>(this T Context)
+    where T : IButtonSelectableContext
+  {
+    Context.button.onClick.RemoveAllListeners();
+    return Context;
+  }
+
+  public static T SetClickListener<T>(this T Context, UnityAction onClickCallback)
+    where T : IButtonSelectableContext
+    => Context.ClearClickListeners().AddClickListener(onClickCallback);
 }

@@ -6,12 +6,11 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
 namespace DysonSphereProgram.Modding.UI.Builder;
-using static UIBuilderDSL;
 
 public static class UIButtonContextExtensions
 {
   public static T WithTransitions<T>(this T context, params UIButton.Transition[] transitions)
-    where T: UIElementContextBase<T>
+    where T: UIElementContext
   {
     var uiButton = context.uiElement.GetOrCreateComponent<UIButton>();
     uiButton.transitions = transitions;
@@ -19,7 +18,7 @@ public static class UIButtonContextExtensions
   }
   
   public static T WithHoverTips<T>(this T context, UIButton.TipSettings tips)
-    where T: UIElementContextBase<T>
+    where T: UIElementContext
   {
     var uiButton = context.uiElement.GetOrCreateComponent<UIButton>();
     uiButton.tips = tips;
@@ -27,14 +26,14 @@ public static class UIButtonContextExtensions
   }
   
   public static T WithInteractionAudios<T>(this T context, UIButton.AudioSettings audios)
-    where T: UIElementContextBase<T>
+    where T: UIElementContext
   {
     var uiButton = context.uiElement.GetOrCreateComponent<UIButton>();
     uiButton.audios = audios;
     return context;
   }
 
-  public static UIButton.Transition WithTarget(this UIButton.Transition original, Graphic target)
+  public static UIButton.Transition CloneWithTarget(this UIButton.Transition original, Graphic target)
   {
     return new UIButton.Transition()
     {

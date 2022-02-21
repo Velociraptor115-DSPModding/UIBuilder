@@ -20,7 +20,7 @@ namespace DysonSphereProgram.Modding.UI.Builder
     private void InitializeFromContext<T>(WindowContext<T> context)
       where T: WindowContext<T>
     {
-      supportsScrolling = context.hasScrollSupport;
+      toCaptureScroll = context.scrollCapture;
       base._Create();
       base._Init(null);
       base._Open();
@@ -28,29 +28,29 @@ namespace DysonSphereProgram.Modding.UI.Builder
 
     public override void _OnClose()
     {
-      if (supportsScrolling)
+      if (toCaptureScroll)
         UIBuilder.inScrollView.Remove(this);
       base._OnClose();
     }
 
-    private bool supportsScrolling;
+    private bool toCaptureScroll;
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-      if (!supportsScrolling)
+      if (!toCaptureScroll)
         return;
       UIBuilder.inScrollView.Add(this);
     }
     public void OnPointerExit(PointerEventData eventData)
     {
-      if (!supportsScrolling)
+      if (!toCaptureScroll)
         return;
       UIBuilder.inScrollView.Remove(this);
     }
     
     private void OnApplicationFocus(bool focus)
     {
-      if (!supportsScrolling)
+      if (!toCaptureScroll)
         return;
       if (!focus)
       {

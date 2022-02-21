@@ -33,7 +33,7 @@ public static partial class UIBuilderDSL
         Create.UIElement("x")
           .WithComponent(out Image xImg, UIBuilder.plainWindowPanelBgXProperties)
           .WithComponent(out Button _, b => b.onClick.AddListener(closeCallback))
-          .WithTransitions(UIBuilder.plainWindowPanelBgXTransition.WithTarget(xImg))
+          .WithTransitions(UIBuilder.plainWindowPanelBgXTransition.CloneWithTarget(xImg))
           .ChildOf(panelBg)
           .WithAnchor(Anchor.TopRight)
           .OfSize(21, 21)
@@ -57,11 +57,7 @@ public static partial class UIBuilderDSL
         .WithAlignment(TextAnchor.MiddleLeft)
         .WithMaterial(UIBuilder.materialWidgetTextAlpha5x)
         .WithColor(Color.white.AlphaMultiplied(0.6f))
-        .WithComponent<ContentSizeFitter>(
-          csf =>
-          {
-            csf.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
-          });
+        .WithContentSizeFitter(horizontal: ContentSizeFitter.FitMode.PreferredSize);
       
       return Context;
     }
