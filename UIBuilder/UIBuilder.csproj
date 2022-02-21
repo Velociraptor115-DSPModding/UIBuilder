@@ -5,10 +5,24 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <LangVersion>10.0</LangVersion>
+  </PropertyGroup>
+
+  <PropertyGroup>
     <PackageId>DysonSphereProgram.Modding.UI.Builder</PackageId>
     <Version>0.0.1</Version>
-    <Authors>Raptor</Authors>
+    <Title>DSP UI Builder</Title>
+    <Authors>Velociraptor115</Authors>
+    <RepositoryUrl>https://github.com/Velociraptor115/DSPMods_UIBuilder</RepositoryUrl>
+    <Description>An experimental API to build game-themed UI with data-binding support with minimal code</Description>
   </PropertyGroup>
+
+  <PropertyGroup>
+    <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\LICENSE.txt" Pack="true" PackagePath="LICENSE.txt"/>
+  </ItemGroup>
   
   <PropertyGroup Condition="'$(Configuration)'=='PackageSources'">
     <IsPackable>true</IsPackable>
