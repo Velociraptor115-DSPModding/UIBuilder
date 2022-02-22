@@ -108,26 +108,36 @@ namespace DysonSphereProgram.Modding.UI.Builder
   public class DataBindInputField : DataBindController<string>
   {
     private InputField inputField;
-    
+    private bool uiDirty;
+
     private void Start()
     {
       inputField = GetComponent<InputField>();
       inputField.onValueChanged.AddListener(ValueChangedHandler);
+      inputField.onEndEdit.AddListener(SubmitHandler);
     }
     
-    private void ValueChangedHandler(string _)
+    private void ValueChangedHandler(string value)
+    {
+      if (value != Binding.Value)
+        uiDirty = true;
+    }
+    
+    private void SubmitHandler(string _)
     {
       ChangedFromUI = true;
     }
 
     protected override void BindingToUI()
     {
-      inputField.text = Binding.Value;
+      if (!uiDirty)
+        inputField.text = Binding.Value;
     }
-    
+
     protected override void UIToBinding()
     {
       Binding.Value = inputField.text;
+      uiDirty = false;
     }
   }
 }
