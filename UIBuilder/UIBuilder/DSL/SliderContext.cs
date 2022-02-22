@@ -92,7 +92,7 @@ public static class SliderContextExtensions
     
     var fillAreaObj =
       UIBuilderDSL.Create.UIElement("fill-area")
-        .ChildOf(uiElement)
+        .ChildOf(backgroundAreaObj)
         .WithAnchor(Anchor.Stretch).At(0, 0)
         .OfSize(-configuration.borderPadding, -configuration.borderPadding)
         .uiElement;
