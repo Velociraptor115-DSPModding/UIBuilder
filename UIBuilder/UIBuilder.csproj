@@ -9,7 +9,7 @@
 
   <PropertyGroup>
     <PackageId>DysonSphereProgram.Modding.UI.Builder</PackageId>
-    <Version>0.0.2</Version>
+    <Version>0.0.3</Version>
     <Title>DSP UI Builder</Title>
     <Authors>Velociraptor115</Authors>
     <RepositoryUrl>https://github.com/Velociraptor115/DSPMods_UIBuilder</RepositoryUrl>
