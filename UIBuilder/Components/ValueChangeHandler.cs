@@ -38,6 +38,10 @@ namespace DysonSphereProgram.Modding.UI.Builder
   }
 
   public class DataBindValueChangedHandlerBool : DataBindValueChangeHandler<bool> {}
+  public class DataBindValueChangedHandlerInt : DataBindValueChangeHandler<int> {}
+  public class DataBindValueChangedHandlerLong : DataBindValueChangeHandler<long> {}
+  public class DataBindValueChangedHandlerFloat : DataBindValueChangeHandler<float> {}
+  public class DataBindValueChangedHandlerDouble : DataBindValueChangeHandler<double> {}
 
   public class ToggleValueChangedHandler : ValueChangeHandler<bool>
   {
@@ -50,5 +54,18 @@ namespace DysonSphereProgram.Modding.UI.Builder
     }
     
     protected override bool CurrentValue => toggle.isOn;
+  }
+  
+  public class SliderValueChangedHandler : ValueChangeHandler<float>
+  {
+    public Slider slider;
+    
+    private void Start()
+    {
+      if (!slider)
+        slider = GetComponent<Slider>();
+    }
+    
+    protected override float CurrentValue => slider.value;
   }
 }
