@@ -36,7 +36,7 @@ public static class InputFieldContextExtensions
     
     inputField.textComponent = text;
 
-    return Select(inputField, text);
+    return Select(inputField, text).WithSelectionEscapeOnSubmit();
   }
   public static T Bind<T>(this T Context, IDataBindSource<string> binding)
     where T: InputFieldContext
@@ -53,9 +53,26 @@ public static class InputFieldContextExtensions
 public static class IInputFieldContextExtensions
 {
   public static T WithContentType<T>(this T Context, InputField.ContentType contentType)
-  where T: IInputFieldSelectableContext
+    where T: IInputFieldSelectableContext
   {
     Context.inputField.contentType = contentType;
     return Context;
+  }
+
+  public static T WithSelectionEscapeOnSubmit<T>(this T Context)
+    where T: IInputFieldSelectableContext
+  {
+    CreateSelectionEscapeOnSubmit(Context.inputField);
+    return Context;
+  }
+
+  private static void CreateSelectionEscapeOnSubmit(InputField inputField)
+  {
+    inputField.onEndEdit.AddListener(_ =>
+    {
+      var es = EventSystem.current;
+      if (!es.alreadySelecting)
+        es.SetSelectedGameObject(null);
+    });
   }
 }
