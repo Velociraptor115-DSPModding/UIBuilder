@@ -30,13 +30,13 @@ namespace DysonSphereProgram.Modding.Raptor.TestUIBuilder
       Plugin.Log = Logger;
       Plugin.Path = Info.Location;
       _harmony = new Harmony(GUID);
-      UIBuilderPlugin.Create(GUID, UIBuilderTest.Create);
+      UIBuilderPlugin.Create(GUID, UIBuilderTest.CreateUI);
       Plugin.Log.LogInfo("TestUIBuilder Awake() called");
     }
 
     private void OnDestroy()
     {
-      UIBuilderTest.Destroy();
+      UIBuilderTest.DestroyUI();
       UIBuilderPlugin.Destroy();
       Plugin.Log.LogInfo("TestUIBuilder OnDestroy() called");
       _harmony?.UnpatchSelf();

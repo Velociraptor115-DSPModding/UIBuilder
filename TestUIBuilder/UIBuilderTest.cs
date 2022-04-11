@@ -18,7 +18,7 @@ namespace DysonSphereProgram.Modding.Raptor.TestUIBuilder
     static UIModWindowBase myWindow;
 
     public static float mySliderValue;
-    public static void Create()
+    public static void CreateUI()
     {
       if (obj != null)
         return;
@@ -26,18 +26,19 @@ namespace DysonSphereProgram.Modding.Raptor.TestUIBuilder
       var windowsObj = GameObject.Find("UI Root/Overlay Canvas/In Game/Windows");
 
       obj =
-        UIBuilderDSL.Create.FancyWindow("Test UI Builder #1")
+        Create.FancyWindow("Test UI Builder #1")
           .ChildOf(windowsObj)
           .WithAnchor(Anchor.TopLeft)
           .OfSize(500, 300)
           .At(300, -180)
           .WithScrollCapture()
+          .WithTitle("Example Window")
           .InitializeComponent(out myWindow)
           .uiElement
           ;
     }
 
-    public static void Destroy()
+    public static void DestroyUI()
     {
       if (obj == null)
         return;
