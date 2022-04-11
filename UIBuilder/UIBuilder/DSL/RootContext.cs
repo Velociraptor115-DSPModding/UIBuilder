@@ -65,7 +65,7 @@ public static partial class UIBuilderDSL
     public readonly ScrollViewContext ScrollView(string name, ScrollViewConfiguration configuration)
       => ScrollViewContextExtensions.Create(UIElement(name).uiElement, configuration);
 
-    public readonly ButtonContext Button(string name, string buttonText, UnityAction onClickCallback)
+    public readonly ButtonContext Button(string name, string buttonText, UnityAction onClickCallback = null)
       => ButtonContextExtensions.Create(UIElement(name).uiElement, buttonText)
           .AddClickListener(onClickCallback);
 

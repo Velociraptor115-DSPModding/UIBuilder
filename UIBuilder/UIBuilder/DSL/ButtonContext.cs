@@ -63,6 +63,7 @@ public static class IButtonContextExtensions
   public static T AddClickListener<T>(this T Context, UnityAction onClickCallback)
     where T : IButtonSelectableContext
   {
+    if (onClickCallback != null)
     Context.button.onClick.AddListener(onClickCallback);
     return Context;
   }
@@ -70,6 +71,7 @@ public static class IButtonContextExtensions
   public static T RemoveClickListener<T>(this T Context, UnityAction onClickCallback)
     where T : IButtonSelectableContext
   {
+    if (onClickCallback != null)
     Context.button.onClick.RemoveListener(onClickCallback);
     return Context;
   }
