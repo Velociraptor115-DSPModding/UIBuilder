@@ -152,12 +152,19 @@ namespace DysonSphereProgram.Modding.UI.Builder
     public static Sprite spriteXIcon;
     public static Sprite spriteRefreshIcon;
     public static Sprite spriteBar4px;
+    public static Sprite spriteCircleThin;
+    public static Sprite spriteRound64Slice;
+    public static Sprite spriteRound64BorderSlice;
     public static Sprite spriteRound256;
+    public static Sprite spriteRoundBlur256;
     public static Sprite spriteHexBg;
     public static Sprite spriteHexBorder;
     public static Sprite spriteHexBorderUp;
     public static Sprite spriteHexBtnLBg;
     public static Sprite spriteHexBtnRBg;
+
+    public static Sprite spriteCheckboxOn;
+    public static Sprite spriteCheckboxOff;
 
     public static Material materialTrslColored;
     public static Material materialTrslLine;
@@ -181,12 +188,13 @@ namespace DysonSphereProgram.Modding.UI.Builder
     public static readonly Color plainWindowPanelBgXTransitionColor = new(0.6549f, 0.9137f, 1f, 1f);
     public static readonly Color fancyWindowPanelBgColor = new(0f, 0.1744f, 0.2157f, 1f);
     public static readonly Color fancyWindowPanelBgBtnBoxColor = new(0f, 0.1744f, 0.2157f, 1f);
-    public static readonly Color fancyWindowPanelBgBtnBoxHexBtnColor = new(0.3804f, 0.8431f, 1f, 0.0262f);
+    public static readonly Color fancyWindowPanelBgBtnBoxHexBtnColor = new Color(0f, 0f, 0f, 0.0824f); // new(0.3804f, 0.8431f, 1f, 0.0262f);
     public static readonly Color fancyWindowPanelBgBtnBoxCloseBtnColor = new(0.3821f, 0.8455f, 1f, 1f);
     public static readonly Color fancyWindowPanelBgBtnBoxHexBtnBgColor = new(0, 0, 0, 0.0824f);
     public static readonly Color scrollBgColor = new(0f, 0f, 0f, 0.7686f);
 
     public static readonly Color buttonBlueColor = new(0.2972f, 0.6886f, 1f, 0.8471f);
+    public static readonly Color buttonRedColor = new(1f, 0.298f, 0.3697f, 0.8471f);
 
     public static void Create()
     {
@@ -246,17 +254,24 @@ namespace DysonSphereProgram.Modding.UI.Builder
         spritePanel5 = Resources.Load<Sprite>("ui/textures/sprites/sci-fi/panel-5");
         spritePanel6 = Resources.Load<Sprite>("ui/textures/sprites/sci-fi/panel-6");
 
-        spriteLitterPanelCC = Resources.Load<Sprite>("ui/textures/sprites/sci-fi/litter-panel-cc");
-        spriteBoxBlur       = Resources.Load<Sprite>("ui/textures/sprites/sci-fi/box-blur");
-        spriteXIcon         = Resources.Load<Sprite>("ui/textures/sprites/sci-fi/x-icon");
-        spriteRefreshIcon   = Resources.Load<Sprite>("ui/textures/sprites/sci-fi/refresh-icon");
-        spriteBar4px        = Resources.Load<Sprite>("ui/textures/sprites/bar-4px");
-        spriteRound256      = Resources.Load<Sprite>("ui/textures/sprites/sci-fi/round-256");
-        spriteHexBg         = Resources.Load<Sprite>("ui/textures/sprites/sci-fi/hex-bg");
-        spriteHexBorder     = Resources.Load<Sprite>("ui/textures/sprites/sci-fi/hex-border");
-        spriteHexBorderUp   = Resources.Load<Sprite>("ui/textures/sprites/sci-fi/hex-border-up");
-        spriteHexBtnLBg     = Resources.Load<Sprite>("ui/textures/sprites/sci-fi/hex-btn-l-bg");
-        spriteHexBtnRBg     = Resources.Load<Sprite>("ui/textures/sprites/sci-fi/hex-btn-r-bg");
+        spriteLitterPanelCC      = Resources.Load<Sprite>("ui/textures/sprites/sci-fi/litter-panel-cc");
+        spriteBoxBlur            = Resources.Load<Sprite>("ui/textures/sprites/sci-fi/box-blur");
+        spriteXIcon              = Resources.Load<Sprite>("ui/textures/sprites/sci-fi/x-icon");
+        spriteRefreshIcon        = Resources.Load<Sprite>("ui/textures/sprites/sci-fi/refresh-icon");
+        spriteBar4px             = Resources.Load<Sprite>("ui/textures/sprites/sci-fi/bar-4px");
+        spriteCircleThin         = Resources.Load<Sprite>("ui/textures/sprites/sci-fi/circle-thin");
+        spriteRound64Slice       = Resources.Load<Sprite>("ui/textures/sprites/round-64px-slice");
+        spriteRound64BorderSlice = Resources.Load<Sprite>("ui/textures/sprites/round-64px-border-slice");
+        spriteRound256           = Resources.Load<Sprite>("ui/textures/sprites/round-256");
+        spriteRoundBlur256       = Resources.Load<Sprite>("ui/textures/sprites/round-blur-256");
+        spriteHexBg              = Resources.Load<Sprite>("ui/textures/sprites/sci-fi/hex-bg");
+        spriteHexBorder          = Resources.Load<Sprite>("ui/textures/sprites/sci-fi/hex-border");
+        spriteHexBorderUp        = Resources.Load<Sprite>("ui/textures/sprites/sci-fi/hex-border-up");
+        spriteHexBtnLBg          = Resources.Load<Sprite>("ui/textures/sprites/sci-fi/hex-btn-l-bg");
+        spriteHexBtnRBg          = Resources.Load<Sprite>("ui/textures/sprites/sci-fi/hex-btn-r-bg");
+        
+        spriteCheckboxOn     = Resources.Load<Sprite>("ui/textures/sprites/icons/checkbox-on");
+        spriteCheckboxOff    = Resources.Load<Sprite>("ui/textures/sprites/icons/checkbox-off");
       }
       
       {
