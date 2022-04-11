@@ -7,11 +7,6 @@ using UnityEngine.EventSystems;
 
 namespace DysonSphereProgram.Modding.UI.Builder;
 
-public interface IToggleSelectableContext : ISelectableContext
-{
-  Toggle toggle { get; }
-}
-
 public record ToggleButtonContext(Toggle toggle, Text text) : UIElementContext(toggle.gameObject), IToggleSelectableContext, ITextContext, ISelectableVisuals
 {
   public Graphic visuals { get; set; }
@@ -100,38 +95,5 @@ public static class ToggleButtonContextExtensions
       toggleComponent.colors = isOn ? onState : offState;
       textComponent.text = isOn ? onText : offText;
     };
-  }
-}
-
-public static class IToggleContextExtensions
-{
-  public static T WithToggleGroup<T>(this T Context, ToggleGroup group)
-    where T : IToggleSelectableContext
-  {
-    Context.toggle.group = group;
-    return Context;
-  }
-  
-  public static T Bind<T>(this T Context, IDataBindSource<bool> binding)
-    where T: UIElementContext, IToggleSelectableContext
-  {
-    using var _ = Context.DeactivatedScope;
-    
-    var bindingController = Context.uiElement.GetOrCreateComponent<DataBindToggleBool>();
-    bindingController.Binding = binding;
-
-    return Context;
-  }
-  
-  public static T Bind<T>(this T Context, IDataBindSource<System.Enum> binding, System.Enum linkedValue)
-    where T: UIElementContext, IToggleSelectableContext
-  {
-    using var _ = Context.DeactivatedScope;
-    
-    var bindingController = Context.uiElement.GetOrCreateComponent<DataBindToggleEnum>();
-    bindingController.linkedValue = linkedValue;
-    bindingController.Binding = binding;
-
-    return Context;
   }
 }

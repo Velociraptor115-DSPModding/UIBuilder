@@ -23,6 +23,9 @@ public static partial class UIBuilderDSL
       => ScrollViewContextExtensions.Select(scrollRect);
     public readonly ButtonContext Button(Button button, Text text = null, Graphic visuals = null)
       => ButtonContextExtensions.Select(button, text, visuals);
+    
+    public readonly ToggleContext Toggle(Toggle toggle, Image image = null)
+      => ToggleContextExtensions.Select(toggle, image);
     public readonly ToggleButtonContext ToggleButton(Toggle toggle, Text text = null, Graphic visuals = null)
       => ToggleButtonContextExtensions.Select(toggle, text, visuals);
     public readonly TextContext Text(Text text)
@@ -69,6 +72,9 @@ public static partial class UIBuilderDSL
       => ButtonContextExtensions.Create(UIElement(name).uiElement, buttonText)
           .AddClickListener(onClickCallback);
 
+    public readonly ToggleContext Toggle(string name)
+      => ToggleContextExtensions.Create(UIElement(name).uiElement);
+    
     public readonly ToggleButtonContext ToggleButton(string name, string buttonText)
       => ToggleButtonContextExtensions.Create(UIElement(name).uiElement, buttonText);
 
