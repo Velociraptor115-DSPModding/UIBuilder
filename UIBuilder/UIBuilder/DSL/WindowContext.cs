@@ -124,9 +124,11 @@ public static partial class UIBuilderDSL
 
     public virtual T WithShadow()
     {
+      var shadow =
       Create.UIElement("shadow")
         .WithComponent(out Image _, shadowCloneImgProperties)
         .ChildOf(uiElement).WithAnchor(Anchor.Stretch);
+      shadow.transform.SetAsFirstSibling();
       return Context;
     }
 
