@@ -132,17 +132,12 @@ public static partial class UIBuilderDSL
       return Context;
     }
 
-    public virtual T WithBorder()
-    {
-      WithPanelBg();
-      Create.UIElement("border")
-        .WithComponent(out Image _, panelBgBorderCloneImgProperties)
-        .ChildOf(panelBg).WithAnchor(Anchor.Stretch);
-      return Context;
-    }
+    public abstract T WithBorder();
     
     public abstract T Context { get; }
 
     public abstract T WithTitle(string title);
+    
+    // TODO: Add WithContentBg
   }
 }

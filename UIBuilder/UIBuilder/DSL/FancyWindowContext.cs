@@ -158,18 +158,30 @@ public static partial class UIBuilderDSL
       return Context;
     }
 
+    public override FancyWindowContext WithBorder()
+    {
+      WithPanelBg();
+      Create.UIElement("border")
+        .WithComponent(out Image _, panelBgBorderCloneImgProperties)
+        .ChildOf(panelBg).WithAnchor(Anchor.Stretch)
+        .OfSize(0, 0);
+      return Context;
+    }
+
     public override FancyWindowContext WithTitle(string title)
     {
       WithPanelBg();
       Create.Text("title-text")
         .ChildOf(panelBg)
         .WithAnchor(Anchor.TopLeft)
-        .At(50, -38)
+        .At(40, -20)
         .WithLocalizer(title)
         .WithFont(UIBuilder.fontSAIRAB)
         .WithFontSize(18)
         .WithAlignment(TextAnchor.MiddleLeft)
-        .WithContentSizeFitter(horizontal: ContentSizeFitter.FitMode.PreferredSize);
+        .OfSize(158, 36)
+        .WithOverflow(HorizontalWrapMode.Wrap, VerticalWrapMode.Truncate)
+        ;
 
       return Context;
     }

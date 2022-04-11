@@ -44,6 +44,16 @@ public static partial class UIBuilderDSL
       return Context;
     }
 
+    public override PlainWindowContext WithBorder()
+    {
+      WithPanelBg();
+      Create.UIElement("border")
+        .WithComponent(out Image _, panelBgBorderCloneImgProperties)
+        .ChildOf(panelBg).WithAnchor(Anchor.Stretch)
+        .OfSize(6, 6);
+      return Context;
+    }
+
     public override PlainWindowContext WithTitle(string title)
     {
       WithPanelBg();
