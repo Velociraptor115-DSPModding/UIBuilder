@@ -52,19 +52,21 @@ public static class ITextContextExtensions
     return Context;
   }
 
+  public static T WithFontSizeExact<T>(this T Context, int fontSize)
+    where T : ITextContext
+  {
+    Context.text.fontSize = fontSize;
+    Context.text.resizeTextForBestFit = false;
+      return Context;
+  }
+
   public static T WithFontSize<T>(this T Context, int fontSize, int? minSize = null, int? maxSize = null)
     where T : ITextContext
   {
     Context.text.fontSize = fontSize;
-    if (minSize is null && maxSize is null)
-      return Context;
-
     Context.text.resizeTextForBestFit = true;
-    if (minSize.HasValue)
-      Context.text.resizeTextMinSize = minSize.Value;
-    if (maxSize.HasValue)
-      Context.text.resizeTextMaxSize = maxSize.Value;
-
+    Context.text.resizeTextMinSize = minSize ?? 10;
+    Context.text.resizeTextMaxSize = maxSize ?? fontSize;
     return Context;
   }
 
