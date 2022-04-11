@@ -12,7 +12,7 @@ public static partial class UIBuilderDSL
     where T: WindowContext<T>
   {
     public bool scrollCapture { get; set; }
-    protected GameObject panelBg { get; set; }
+    public GameObject panelBg { get; protected set; }
     protected abstract TranslucentImageProperties panelBgCloneImgProperties { get; }
     protected abstract ImageProperties panelBgBorderCloneImgProperties { get; }
     protected abstract ImageProperties panelBgDragTriggerCloneImgProperties { get; }
@@ -125,15 +125,15 @@ public static partial class UIBuilderDSL
     public virtual T WithShadow()
     {
       var shadow =
-      Create.UIElement("shadow")
-        .WithComponent(out Image _, shadowCloneImgProperties)
-        .ChildOf(uiElement).WithAnchor(Anchor.Stretch);
+        Create.UIElement("shadow")
+          .WithComponent(out Image _, shadowCloneImgProperties)
+          .ChildOf(uiElement).WithAnchor(Anchor.Stretch);
       shadow.transform.SetAsFirstSibling();
       return Context;
     }
 
     public abstract T WithBorder();
-    
+
     public abstract T Context { get; }
 
     public abstract T WithTitle(string title);
