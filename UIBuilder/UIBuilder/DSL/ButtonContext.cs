@@ -47,6 +47,7 @@ public static class ButtonContextExtensions
     var text =
       UIBuilderDSL.Create.Text("text")
         .WithOverflow(vertical: VerticalWrapMode.Truncate)
+        .WithFont(UIBuilder.fontSAIRASB)
         .WithFontSize(16)
         .WithLocalizer(buttonText)
         .ChildOf(button.gameObject)
@@ -64,7 +65,7 @@ public static class IButtonContextExtensions
     where T : IButtonSelectableContext
   {
     if (onClickCallback != null)
-    Context.button.onClick.AddListener(onClickCallback);
+      Context.button.onClick.AddListener(onClickCallback);
     return Context;
   }
   
@@ -72,7 +73,7 @@ public static class IButtonContextExtensions
     where T : IButtonSelectableContext
   {
     if (onClickCallback != null)
-    Context.button.onClick.RemoveListener(onClickCallback);
+      Context.button.onClick.RemoveListener(onClickCallback);
     return Context;
   }
   

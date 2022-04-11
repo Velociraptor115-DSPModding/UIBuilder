@@ -47,6 +47,7 @@ public static class ToggleButtonContextExtensions
     var text =
       UIBuilderDSL.Create.Text("text")
         .WithOverflow(vertical: VerticalWrapMode.Truncate)
+        .WithFont(UIBuilder.fontSAIRASB)
         .WithFontSize(16)
         .WithLocalizer(buttonText)
         .ChildOf(toggle.gameObject)

@@ -23,7 +23,7 @@ public static class TextContextExtensions
   public static TextContext Create(GameObject uiElement)
   {
     var text = uiElement.GetOrCreateComponent<Text>();
-    text.font = UIBuilder.fontSAIRASB;
+    text.font = UIBuilder.fontSAIRAR;
     text.alignment = TextAnchor.MiddleCenter;
     text.verticalOverflow = VerticalWrapMode.Overflow;
     return Select(text);
@@ -51,13 +51,13 @@ public static class ITextContextExtensions
     Context.text.font = font;
     return Context;
   }
-
+  
   public static T WithFontSizeExact<T>(this T Context, int fontSize)
     where T : ITextContext
   {
     Context.text.fontSize = fontSize;
     Context.text.resizeTextForBestFit = false;
-      return Context;
+    return Context;
   }
 
   public static T WithFontSize<T>(this T Context, int fontSize, int? minSize = null, int? maxSize = null)
