@@ -35,29 +35,29 @@ namespace DysonSphereProgram.Modding.UI.Builder
     }
 
     [HarmonyPostfix]
-    [HarmonyPatch(typeof(UIGame), nameof(UIGame._OnCreate))]
-    static void UIGame___OnCreate()
+    [HarmonyPatch(typeof(UIRoot), nameof(UIRoot._OnCreate))]
+    static void UIRoot___OnCreate()
     {
       Create();
     }
 
     //[HarmonyPostfix]
-    //[HarmonyPatch(typeof(UIGame), nameof(UIGame._OnUpdate))]
-    //static void UIGame___OnUpdate()
+    //[HarmonyPatch(typeof(UIRoot), nameof(UIRoot._OnUpdate))]
+    //static void UIRoot___OnUpdate()
     //{
       
     //}
 
     //[HarmonyPrefix]
-    //[HarmonyPatch(typeof(UIGame), nameof(UIGame._OnFree))]
-    //static void UIGame___OnFree()
+    //[HarmonyPatch(typeof(UIRoot), nameof(UIRoot._OnFree))]
+    //static void UIRoot___OnFree()
     //{
       
     //}
 
     [HarmonyPrefix]
-    [HarmonyPatch(typeof(UIGame), nameof(UIGame._OnDestroy))]
-    static void UIGame___OnDestroy()
+    [HarmonyPatch(typeof(UIRoot), nameof(UIRoot._OnDestroy))]
+    static void UIRoot___OnDestroy()
     {
       Destroy();
     }
