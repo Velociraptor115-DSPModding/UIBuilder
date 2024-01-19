@@ -55,7 +55,7 @@ namespace PackagePrep
                 {
                     var text = File.ReadAllText(file, Encoding.UTF8);
 
-                    text = text.Replace($"{rootNamespace}.", "$RootNamespace$.");
+                    text = text.Replace($"{rootNamespace}", "$UIBuilderRootNamespace$");
 
                     var sb = new StringBuilder();
                     sb.AppendLine(text);

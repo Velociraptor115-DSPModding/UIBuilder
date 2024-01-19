@@ -1,0 +1,11 @@
+<Project>
+  <PropertyGroup>
+    <UIBuilderRootNamespace Condition="!Exists('$(UIBuilderRootNamespace)')">$(RootNamespace)</UIBuilderRootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <NuGetPreprocessorValue Include="UIBuilderRootNamespace">
+      <Value>$(UIBuilderRootNamespace)</Value>
+    </NuGetPreprocessorValue>
+  </ItemGroup>
+</Project>
