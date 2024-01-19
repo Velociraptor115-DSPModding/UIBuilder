@@ -71,7 +71,7 @@
   
   <!-- Unfortunately the .nuspec file is not valid for .pp files due to the attributes added by None/Content/Compile -->
   <Target Name="PostPack" AfterTargets="Pack" Condition="'$(Configuration)'=='PackageSources'">
-    <Exec Command="dotnet run --project &quot;..\PackagePrep&quot; -- nuspec $(ProjectDir)bin\$(Configuration)" />
+    <Exec Command="dotnet run --project &quot;../PackagePrep&quot; -- nuspec $(ProjectDir)bin\$(Configuration)" />
   </Target>
   
   <!-- Transform all .cs files into .cs.pp files with $RootNamespace$ -->
